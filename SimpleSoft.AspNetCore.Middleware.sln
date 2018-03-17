@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E9BEC3A1-0E46-48D4-9BC1-62C1AFE7B165}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoft.AspNetCore.Middleware", "src\SimpleSoft.AspNetCore.Middleware\SimpleSoft.AspNetCore.Middleware.csproj", "{4700FDF0-7F58-40CB-8046-F0233F1A745D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoft.AspNetCore.Middleware", "src\SimpleSoft.AspNetCore.Middleware\SimpleSoft.AspNetCore.Middleware.csproj", "{4700FDF0-7F58-40CB-8046-F0233F1A745D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA069C62-3AD1-4EC3-A002-FC3DECEFF48C}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,7 +14,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA069C62
 		tools\SimpleSoft.AspNetCore.snk = tools\SimpleSoft.AspNetCore.snk
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoft.AspNetCore.Middleware.Metadata", "src\SimpleSoft.AspNetCore.Middleware.Metadata\SimpleSoft.AspNetCore.Middleware.Metadata.csproj", "{A55C197D-A5E1-4DC4-8854-D6AF197C7E45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSoft.AspNetCore.Middleware.Metadata", "src\SimpleSoft.AspNetCore.Middleware.Metadata\SimpleSoft.AspNetCore.Middleware.Metadata.csproj", "{A55C197D-A5E1-4DC4-8854-D6AF197C7E45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{664654B7-50DF-4A95-B779-E7A0899D6007}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
