@@ -24,11 +24,7 @@ namespace SimpleSoft.AspNetCore.Middleware
         /// </summary>
         protected RequestDelegate Next { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public abstract Task Invoke(HttpContext context);
     }
 }
