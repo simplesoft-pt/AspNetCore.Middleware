@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>../../tools/SimpleSoft.Mediator.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../tools/SimpleSoft.AspNetCore.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <SignAssembly>true</SignAssembly>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

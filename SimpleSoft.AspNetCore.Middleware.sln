@@ -7,6 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E9BEC3A1-0E4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSoft.AspNetCore.Middleware", "src\SimpleSoft.AspNetCore.Middleware\SimpleSoft.AspNetCore.Middleware.csproj", "{4700FDF0-7F58-40CB-8046-F0233F1A745D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA069C62-3AD1-4EC3-A002-FC3DECEFF48C}"
+	ProjectSection(SolutionItems) = preProject
+		tools\assemblymetadata.ps1 = tools\assemblymetadata.ps1
+		tools\SimpleSoft.AspNetCore.PublicKey = tools\SimpleSoft.AspNetCore.PublicKey
+		tools\SimpleSoft.AspNetCore.snk = tools\SimpleSoft.AspNetCore.snk
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
