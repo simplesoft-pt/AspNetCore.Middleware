@@ -18,7 +18,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.0" />
   </ItemGroup>
