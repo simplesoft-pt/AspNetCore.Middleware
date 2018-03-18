@@ -12,9 +12,6 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
     /// </summary>
     public class MetadataMiddleware : SimpleSoftMiddleware
     {
-        private readonly MetadataOptions _options;
-        private readonly ILogger<MetadataMiddleware> _logger;
-
         /// <summary>
         /// Creates a new instance
         /// </summary>
@@ -28,39 +25,52 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            _options = options.Value;
-            _logger = logger ?? NullLogger<MetadataMiddleware>.Instance;
+            Options = options.Value;
+            Logger = logger ?? NullLogger<MetadataMiddleware>.Instance;
         }
+
+        /// <summary>
+        /// The middleware options
+        /// </summary>
+        protected MetadataOptions Options { get; }
+
+        /// <summary>
+        /// The middleware logger
+        /// </summary>
+        protected ILogger<MetadataMiddleware> Logger { get; }
 
         /// <inheritdoc />
         public override Task Invoke(HttpContext context)
         {
             if (context.Response.HasStarted)
             {
-                _logger.LogWarning("The response has already started, the middleware will not be executed.");
+                Logger.LogWarning("The response has already started, the middleware will not be executed.");
                 return Task.CompletedTask;
             }
 
-            _logger.LogDebug("Returning application metadata");
+            Logger.LogDebug("Returning application metadata");
 
-            var metadata = new
-            {
-                _options.Name,
-                _options.Environment,
-                _options.StartedOn,
-                Version = new
-                {
-                    _options.Version?.Major,
-                    _options.Version?.Minor,
-                    _options.Version?.Patch,
-                    _options.Version?.Revision,
-                    _options.Version?.Alias,
-                }
-            };
+            var metadata = GetMetadata();
 
             context.Response.Clear();
             context.Response.StatusCode = 200;
-            return context.Response.WriteJsonAsync(metadata, _options.IndentJson);
+            return context.Response.WriteJsonAsync(metadata, Options.IndentJson);
+        }
+
+        /// <summary>
+        /// Gets the medatata model that will be serialized
+        /// as the JSON response.
+        /// </summary>
+        /// <returns>The metadata instance</returns>
+        protected virtual MetadataModel GetMetadata()
+        {
+            var version = Options.Version == null
+                ? null
+                : new MetadataVersionModel(
+                    Options.Version.Major, Options.Version.Minor, Options.Version.Patch,
+                    Options.Version.Revision, Options.Version.Alias);
+
+            return new MetadataModel(Options.Name, Options.Environment, Options.StartedOn, version);
         }
     }
 }
