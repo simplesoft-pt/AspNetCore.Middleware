@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>SimpleSoft.AspNetCore.Middleware.Metadata</RootNamespace>
@@ -34,7 +34,7 @@
 
   <PropertyGroup>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.18001</FileVersion>
+    <FileVersion>1.0.0.18077</FileVersion>
     <VersionPrefix>1.0.0-dev001</VersionPrefix>
   </PropertyGroup>
 
