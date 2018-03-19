@@ -26,7 +26,7 @@
         public uint Revision { get; set; }
 
         /// <summary>
-        /// Version alias. Defaults to '0.0.0'
+        /// Version alias
         /// </summary>
         public string Alias { get; set; } = "0.0.0";
     }
