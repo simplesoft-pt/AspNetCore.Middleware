@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
@@ -21,23 +20,17 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <exception cref="ArgumentNullException"></exception>
         public MetadataMiddleware(RequestDelegate next,
             IOptions<MetadataOptions> options, ILogger<MetadataMiddleware> logger = null) 
-            : base(next)
+            : base(next, logger)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             Options = options.Value;
-            Logger = logger ?? NullLogger<MetadataMiddleware>.Instance;
         }
 
         /// <summary>
         /// The middleware options
         /// </summary>
         protected MetadataOptions Options { get; }
-
-        /// <summary>
-        /// The middleware logger
-        /// </summary>
-        protected ILogger<MetadataMiddleware> Logger { get; }
 
         /// <inheritdoc />
         public override Task Invoke(HttpContext context)
