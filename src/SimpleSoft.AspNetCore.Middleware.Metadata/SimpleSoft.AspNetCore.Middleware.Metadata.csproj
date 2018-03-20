@@ -4,7 +4,7 @@
     <RootNamespace>SimpleSoft.AspNetCore.Middleware.Metadata</RootNamespace>
     <AssemblyTitle>SimpleSoft.AspNetCore.Middleware.Metadata</AssemblyTitle>
     <AssemblyName>SimpleSoft.AspNetCore.Middleware.Metadata</AssemblyName>
-    <Description>Utilitary middleware for ASP.NET Core applications.</Description>
+    <Description>Utilitary middleware for ASP.NET Core applications, that will return the API metadata.</Description>
     <Product>SimpleSoft.AspNetCore.Middleware</Product>
     <Company>SimpleSoft.pt</Company>
     <Copyright>Copyright © 2018 SimpleSoft.pt</Copyright>
