@@ -9,14 +9,20 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
     /// </summary>
     public class MetadataOptions
     {
-        private static readonly DateTimeOffset DefaultStartedOn = DateTimeOffset.Now;
+        private static readonly string DefaultName;
+        private static readonly DateTimeOffset DefaultStartedOn;
         private static readonly MetadataVersionOptions DefaultVersionOptions;
 
         static MetadataOptions()
         {
+            var entryAssembly = Assembly.GetEntryAssembly();
+
+            DefaultName = entryAssembly.GetName().Name;
+            DefaultStartedOn = DateTimeOffset.Now;
+
             try
             {
-                var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+                var fvi = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
 
                 DefaultVersionOptions = new MetadataVersionOptions
                 {
@@ -46,7 +52,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <summary>
         /// The API name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = DefaultName;
 
         /// <summary>
         /// The API environment
