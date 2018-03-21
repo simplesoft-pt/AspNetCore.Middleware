@@ -17,15 +17,15 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="action">The action invoked to calculate the current status</param>
         /// <param name="name">The health check name</param>
+        /// <param name="action">The action invoked to calculate the current status</param>
         /// <param name="logger">The health check logger</param>
         /// <param name="required">Is the health check required?</param>
         /// <param name="tags">The collection of tags</param>
         /// <exception cref="ArgumentNullException"></exception>
         public DelegatingHealthCheck(
-            Func<CancellationToken, Task<HealthCheckStatus>> action,
-            string name, ILogger<DelegatingHealthCheck> logger = null, bool required = false, params string[] tags) 
+            string name, Func<CancellationToken, Task<HealthCheckStatus>> action,
+            ILogger<DelegatingHealthCheck> logger = null, bool required = false, params string[] tags) 
             : base(name, logger, required, tags)
         {
             _action = action ?? throw new ArgumentNullException(nameof(action));
