@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
@@ -19,15 +20,25 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Creates a new instance
         /// </summary>
         /// <param name="next">The request delegate</param>
+        /// <param name="options"></param>
         /// <param name="healthChecks">The collection of health checks</param>
         /// <param name="logger">An optional logger instance</param>
         /// <exception cref="ArgumentNullException"></exception>
         public HealthCheckMiddleware(RequestDelegate next, 
-            IEnumerable<IHealthCheck> healthChecks, ILogger<HealthCheckMiddleware> logger = null) 
+            IOptions<HealthCheckOptions> options, IEnumerable<IHealthCheck> healthChecks, 
+            ILogger<HealthCheckMiddleware> logger = null) 
             : base(next, logger)
         {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            Options = options.Value;
             _healthChecks = healthChecks?.ToArray() ?? throw new ArgumentNullException(nameof(healthChecks));
         }
+
+        /// <summary>
+        /// The middleware options
+        /// </summary>
+        protected HealthCheckOptions Options { get; }
 
         /// <inheritdoc />
         public override async Task Invoke(HttpContext context)
@@ -74,7 +85,14 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             await context.Response.WriteJsonAsync(result, true);
         }
 
-        private async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, CancellationToken ct)
+        /// <summary>
+        /// Calculates the status for a given health check. It is also expected to handle
+        /// exceptions thrown.
+        /// </summary>
+        /// <param name="healthCheck">The health check</param>
+        /// <param name="ct">The cancellation token</param>
+        /// <returns>A task to be awaited for the result</returns>
+        protected virtual async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, CancellationToken ct)
         {
             using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
             {
