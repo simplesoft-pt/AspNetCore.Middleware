@@ -82,7 +82,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             context.Response.Clear();
             context.Response.StatusCode = result.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
-            await context.Response.WriteJsonAsync(result, true);
+            await context.Response.WriteJsonAsync(result, Options.IndentJson);
         }
 
         /// <summary>
