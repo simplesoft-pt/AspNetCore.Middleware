@@ -49,18 +49,15 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <inheritdoc />
         public virtual async Task UpdateStatusAsync(CancellationToken ct)
         {
-            using (Logger.BeginScope("CheckId:'{checkId}'", Guid.NewGuid().ToString("N")))
+            try
             {
-                try
-                {
-                    Logger.LogDebug("Updating health check status");
-                    Status = await OnUpdateStatusAsync(ct);
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError(e, "Health check failed");
-                    Status = HealthCheckStatus.Red;
-                }
+                Logger.LogDebug("Updating health check status");
+                Status = await OnUpdateStatusAsync(ct);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Health check failed");
+                Status = HealthCheckStatus.Red;
             }
         }
 

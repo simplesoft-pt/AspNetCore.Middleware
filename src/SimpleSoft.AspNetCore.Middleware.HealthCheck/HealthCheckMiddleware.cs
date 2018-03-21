@@ -39,37 +39,38 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             Logger.LogDebug("Checking all health checks");
 
-            var startedOn = DateTimeOffset.Now;
-
-            await Task.WhenAll(
-                _healthChecks.Select(hc => hc.UpdateStatusAsync(context.RequestAborted)));
-
-            Logger.LogDebug("All health checks statuses have been updated");
-
             var result = new HealthCheckModel
             {
                 Status = HealthCheckGlobalStatus.Green,
-                StartedOn = startedOn,
-                TerminatedOn = DateTimeOffset.Now,
+                StartedOn = DateTimeOffset.Now,
                 Dependencies = new Dictionary<string, HealthCheckDependencyModel>()
             };
             foreach (var healthCheck in _healthChecks)
             {
-                if (healthCheck.Status == HealthCheckStatus.Red)
+                using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
                 {
-                    if (healthCheck.Required)
-                        result.Status = HealthCheckGlobalStatus.Red;
-                    else if (result.Status == HealthCheckGlobalStatus.Green)
-                        result.Status = HealthCheckGlobalStatus.Yellow;
-                }
+                    await healthCheck.UpdateStatusAsync(context.RequestAborted);
 
-                result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
-                {
-                    Status = healthCheck.Status,
-                    Required = healthCheck.Required,
-                    Tags = healthCheck.Tags.ToArray()
-                });
+                    if (healthCheck.Status == HealthCheckStatus.Red)
+                    {
+                        if (healthCheck.Required)
+                            result.Status = HealthCheckGlobalStatus.Red;
+                        else if (result.Status == HealthCheckGlobalStatus.Green)
+                            result.Status = HealthCheckGlobalStatus.Yellow;
+                    }
+
+                    result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
+                    {
+                        Status = healthCheck.Status,
+                        Required = healthCheck.Required,
+                        Tags = healthCheck.Tags.ToArray()
+                    });
+                }
             }
+
+            Logger.LogDebug("All health checks statuses have been updated");
+
+            result.TerminatedOn = DateTimeOffset.Now;
 
             context.Response.Clear();
             context.Response.StatusCode = result.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
