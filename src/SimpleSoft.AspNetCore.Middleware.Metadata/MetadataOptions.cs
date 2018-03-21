@@ -45,7 +45,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         public string Path { get; set; } = "api/_meta";
 
         /// <summary>
-        /// Indent the metadata JSON response?
+        /// Indent the JSON response?
         /// </summary>
         public bool IndentJson { get; set; } = true;
 
