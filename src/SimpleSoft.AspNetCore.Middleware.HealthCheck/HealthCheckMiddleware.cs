@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
@@ -82,7 +84,15 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             context.Response.Clear();
             context.Response.StatusCode = result.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
-            await context.Response.WriteJsonAsync(result, Options.IndentJson);
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None
+            };
+            if (Options.StringEnum)
+                jsonSettings.Converters.Add(new StringEnumConverter(true));
+
+            await context.Response.WriteJsonAsync(result, jsonSettings);
         }
 
         /// <summary>
