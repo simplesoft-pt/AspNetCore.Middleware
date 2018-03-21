@@ -40,32 +40,32 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         }
 
         /// <summary>
-        /// Path for which the middleware responds
+        /// Path for which the middleware responds. Defaults to 'api/_meta'.
         /// </summary>
         public string Path { get; set; } = "api/_meta";
 
         /// <summary>
-        /// Indent the JSON response?
+        /// Indent the JSON response? Defaults to 'true'.
         /// </summary>
         public bool IndentJson { get; set; } = true;
 
         /// <summary>
-        /// The API name
+        /// The API name. Defaults to entry assembly name.
         /// </summary>
         public string Name { get; set; } = DefaultName;
 
         /// <summary>
-        /// The API environment
+        /// The API environment. Defaults to null.
         /// </summary>
         public string Environment { get; set; }
 
         /// <summary>
-        /// The API startup date and time
+        /// The API startup date and time. Defaults to this class first static initialization date and time.
         /// </summary>
         public DateTimeOffset StartedOn { get; set; } = DefaultStartedOn;
 
         /// <summary>
-        /// The API version
+        /// The API version. Defaults to entry assembly file and product versions.
         /// </summary>
         public MetadataVersionOptions Version { get; set; } = new MetadataVersionOptions
         {
