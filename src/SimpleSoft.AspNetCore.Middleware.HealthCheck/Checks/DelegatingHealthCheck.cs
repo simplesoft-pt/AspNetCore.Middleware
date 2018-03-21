@@ -19,7 +19,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// </summary>
         /// <param name="name">The health check name</param>
         /// <param name="action">The action invoked to calculate the current status</param>
-        /// <param name="logger">The health check logger</param>
+        /// <param name="logger">An optional logger instance</param>
         /// <param name="required">Is the health check required?</param>
         /// <param name="tags">The collection of tags</param>
         /// <exception cref="ArgumentNullException"></exception>

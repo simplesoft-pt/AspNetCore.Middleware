@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -47,25 +48,21 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             };
             foreach (var healthCheck in _healthChecks)
             {
-                using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
+                var status = await CalculateStatusAsync(healthCheck, context.RequestAborted);
+                if (status == HealthCheckStatus.Red)
                 {
-                    await healthCheck.UpdateStatusAsync(context.RequestAborted);
-
-                    if (healthCheck.Status == HealthCheckStatus.Red)
-                    {
-                        if (healthCheck.Required)
-                            result.Status = HealthCheckGlobalStatus.Red;
-                        else if (result.Status == HealthCheckGlobalStatus.Green)
-                            result.Status = HealthCheckGlobalStatus.Yellow;
-                    }
-
-                    result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
-                    {
-                        Status = healthCheck.Status,
-                        Required = healthCheck.Required,
-                        Tags = healthCheck.Tags.ToArray()
-                    });
+                    if (healthCheck.Required)
+                        result.Status = HealthCheckGlobalStatus.Red;
+                    else if (result.Status == HealthCheckGlobalStatus.Green)
+                        result.Status = HealthCheckGlobalStatus.Yellow;
                 }
+
+                result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
+                {
+                    Status = status,
+                    Required = healthCheck.Required,
+                    Tags = healthCheck.Tags.ToArray()
+                });
             }
 
             Logger.LogDebug("All health checks statuses have been updated");
@@ -75,6 +72,25 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             context.Response.Clear();
             context.Response.StatusCode = result.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
             await context.Response.WriteJsonAsync(result, true);
+        }
+
+        private async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, CancellationToken ct)
+        {
+            using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
+            {
+                Logger.LogDebug("Performing an health check");
+
+                try
+                {
+                    await healthCheck.UpdateStatusAsync(ct);
+                    return healthCheck.Status;
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e, "Health check failed");
+                    return HealthCheckStatus.Red;
+                }
+            }
         }
     }
 }

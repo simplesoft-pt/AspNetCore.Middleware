@@ -13,11 +13,14 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public abstract class HealthCheck : IHealthCheck
     {
+        private static readonly Task<HealthCheckStatus> CachedHealthCheckStatusTask =
+            Task.FromResult(HealthCheckStatus.Green);
+
         /// <summary>
         /// Creates a new instance.
         /// </summary>
         /// <param name="name">The health check name</param>
-        /// <param name="logger">The health check logger</param>
+        /// <param name="logger">An optional logger instance</param>
         /// <param name="required">Is the health check required?</param>
         /// <param name="tags">The collection of tags</param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -47,26 +50,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         public IReadOnlyCollection<string> Tags { get; }
 
         /// <inheritdoc />
-        public virtual async Task UpdateStatusAsync(CancellationToken ct)
-        {
-            try
-            {
-                Logger.LogDebug("Updating health check status");
-                Status = await OnUpdateStatusAsync(ct);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Health check failed");
-                Status = HealthCheckStatus.Red;
-            }
-        }
+        public virtual async Task UpdateStatusAsync(CancellationToken ct) => Status = await OnUpdateStatusAsync(ct);
 
         /// <summary>
         /// Invoked to calculate the current health check status.
-        /// Exceptions thrown will be catch by the underline implementation.
         /// </summary>
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
-        public abstract Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct);
+        public virtual Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct) => CachedHealthCheckStatusTask;
     }
 }
