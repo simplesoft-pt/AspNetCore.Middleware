@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -20,30 +21,22 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Creates a new instance
         /// </summary>
         /// <param name="next">The request delegate</param>
-        /// <param name="options"></param>
-        /// <param name="healthChecks">The collection of health checks</param>
+        /// <param name="options">The middleware options</param>
         /// <param name="logger">An optional logger instance</param>
         /// <exception cref="ArgumentNullException"></exception>
         public HealthCheckMiddleware(RequestDelegate next, 
-            IOptions<HealthCheckOptions> options, IEnumerable<IHealthCheck> healthChecks, 
-            ILogger<HealthCheckMiddleware> logger = null) 
+            IOptions<HealthCheckOptions> options, ILogger<HealthCheckMiddleware> logger = null) 
             : base(next, logger)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             Options = options.Value;
-            HealthChecks = healthChecks?.ToArray() ?? throw new ArgumentNullException(nameof(healthChecks));
         }
 
         /// <summary>
         /// The middleware options
         /// </summary>
         protected HealthCheckOptions Options { get; }
-
-        /// <summary>
-        /// The health check collection
-        /// </summary>
-        protected IReadOnlyCollection<IHealthCheck> HealthChecks { get; }
 
         /// <inheritdoc />
         public override async Task Invoke(HttpContext context)
@@ -56,7 +49,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             Logger.LogDebug("Checking all health checks");
 
-            var healthCheck = await RunHealthChecksAsync(context);
+            var healthCheck = await RunHealthChecksAsync(
+                context.RequestServices.GetServices<IHealthCheck>(), context, context.RequestAborted);
 
             Logger.LogDebug("All health checks statuses have been updated");
 
@@ -75,9 +69,11 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// Runs the health checks
         /// </summary>
+        /// <param name="healthChecks">The collection of health checks</param>
         /// <param name="context">The HTTP context</param>
+        /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
-        protected virtual async Task<HealthCheckModel> RunHealthChecksAsync(HttpContext context)
+        protected virtual async Task<HealthCheckModel> RunHealthChecksAsync(IEnumerable<IHealthCheck> healthChecks, HttpContext context, CancellationToken ct)
         {
             var result = new HealthCheckModel
             {
@@ -85,13 +81,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                 StartedOn = DateTimeOffset.Now,
                 Dependencies = new Dictionary<string, HealthCheckDependencyModel>()
             };
-            foreach (var healthCheck in HealthChecks)
+            foreach (var healthCheck in healthChecks)
             {
                 using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
                 {
                     Logger.LogDebug("Performing an health check");
 
-                    var status = await CalculateStatusAsync(healthCheck, context.RequestAborted);
+                    var status = await CalculateStatusAsync(healthCheck, context, ct);
                     if (status == HealthCheckStatus.Red)
                     {
                         if (healthCheck.Required)
@@ -119,9 +115,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// exceptions thrown by the health check.
         /// </summary>
         /// <param name="healthCheck">The health check</param>
+        /// <param name="context">The HTTP context</param>
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
-        protected virtual async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, CancellationToken ct)
+        protected virtual async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, HttpContext context, CancellationToken ct)
         {
             try
             {
