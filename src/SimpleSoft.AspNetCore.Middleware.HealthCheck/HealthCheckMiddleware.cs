@@ -16,8 +16,6 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public class HealthCheckMiddleware : SimpleSoftMiddleware
     {
-        private readonly IHealthCheck[] _healthChecks;
-
         /// <summary>
         /// Creates a new instance
         /// </summary>
@@ -34,13 +32,18 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             Options = options.Value;
-            _healthChecks = healthChecks?.ToArray() ?? throw new ArgumentNullException(nameof(healthChecks));
+            HealthChecks = healthChecks?.ToArray() ?? throw new ArgumentNullException(nameof(healthChecks));
         }
 
         /// <summary>
         /// The middleware options
         /// </summary>
         protected HealthCheckOptions Options { get; }
+
+        /// <summary>
+        /// The health check collection
+        /// </summary>
+        protected IReadOnlyCollection<IHealthCheck> HealthChecks { get; }
 
         /// <inheritdoc />
         public override async Task Invoke(HttpContext context)
@@ -53,37 +56,12 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             Logger.LogDebug("Checking all health checks");
 
-            var result = new HealthCheckModel
-            {
-                Status = HealthCheckGlobalStatus.Green,
-                StartedOn = DateTimeOffset.Now,
-                Dependencies = new Dictionary<string, HealthCheckDependencyModel>()
-            };
-            foreach (var healthCheck in _healthChecks)
-            {
-                var status = await CalculateStatusAsync(healthCheck, context.RequestAborted);
-                if (status == HealthCheckStatus.Red)
-                {
-                    if (healthCheck.Required)
-                        result.Status = HealthCheckGlobalStatus.Red;
-                    else if (result.Status == HealthCheckGlobalStatus.Green)
-                        result.Status = HealthCheckGlobalStatus.Yellow;
-                }
-
-                result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
-                {
-                    Status = status,
-                    Required = healthCheck.Required,
-                    Tags = healthCheck.Tags.ToArray()
-                });
-            }
+            var healthCheck = await RunHealthChecksAsync(context);
 
             Logger.LogDebug("All health checks statuses have been updated");
 
-            result.TerminatedOn = DateTimeOffset.Now;
-
             context.Response.Clear();
-            context.Response.StatusCode = result.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
+            context.Response.StatusCode = healthCheck.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
 
             var jsonSettings = new JsonSerializerSettings
             {
@@ -91,33 +69,69 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             };
             if (Options.StringEnum)
                 jsonSettings.Converters.Add(new StringEnumConverter(true));
+            await context.Response.WriteJsonAsync(healthCheck, jsonSettings);
+        }
 
-            await context.Response.WriteJsonAsync(result, jsonSettings);
+        /// <summary>
+        /// Runs the health checks
+        /// </summary>
+        /// <param name="context">The HTTP context</param>
+        /// <returns>A task to be awaited for the result</returns>
+        protected virtual async Task<HealthCheckModel> RunHealthChecksAsync(HttpContext context)
+        {
+            var result = new HealthCheckModel
+            {
+                Status = HealthCheckGlobalStatus.Green,
+                StartedOn = DateTimeOffset.Now,
+                Dependencies = new Dictionary<string, HealthCheckDependencyModel>()
+            };
+            foreach (var healthCheck in HealthChecks)
+            {
+                using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
+                {
+                    Logger.LogDebug("Performing an health check");
+
+                    var status = await CalculateStatusAsync(healthCheck, context.RequestAborted);
+                    if (status == HealthCheckStatus.Red)
+                    {
+                        if (healthCheck.Required)
+                            result.Status = HealthCheckGlobalStatus.Red;
+                        else if (result.Status == HealthCheckGlobalStatus.Green)
+                            result.Status = HealthCheckGlobalStatus.Yellow;
+                    }
+
+                    result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
+                    {
+                        Status = status,
+                        Required = healthCheck.Required,
+                        Tags = healthCheck.Tags.ToArray()
+                    });
+                }
+            }
+
+            result.TerminatedOn = DateTimeOffset.Now;
+
+            return result;
         }
 
         /// <summary>
         /// Calculates the status for a given health check. It is also expected to handle
-        /// exceptions thrown.
+        /// exceptions thrown by the health check.
         /// </summary>
         /// <param name="healthCheck">The health check</param>
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
         protected virtual async Task<HealthCheckStatus> CalculateStatusAsync(IHealthCheck healthCheck, CancellationToken ct)
         {
-            using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
+            try
             {
-                Logger.LogDebug("Performing an health check");
-
-                try
-                {
-                    await healthCheck.UpdateStatusAsync(ct);
-                    return healthCheck.Status;
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError(e, "Health check failed");
-                    return HealthCheckStatus.Red;
-                }
+                await healthCheck.UpdateStatusAsync(ct);
+                return healthCheck.Status;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Health check failed");
+                return HealthCheckStatus.Red;
             }
         }
     }
