@@ -24,7 +24,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                         throw new Exception("Random health check exception");
                     return HealthCheckStatus.Green;
                 }, s.GetService<ILogger<DelegatingHealthCheck>>()))
-                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception", async ct =>
+                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception-required", async ct =>
                 {
                     await Task.Delay(200, ct);
                     if (DateTimeOffset.Now.Millisecond % 2 == 0)
@@ -41,10 +41,11 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             app.UseMetadata(new MetadataOptions
             {
                 Path = "_meta",
-                IndentJson = true,
+                IndentJson = env.IsDevelopment(),
+                IncludeNullProperties = true,
                 Name = "SimpleSoft Middleware ExampleApi",
                 Environment = env.EnvironmentName,
-                StartedOn = DateTimeOffset.UtcNow,
+                StartedOn = DateTimeOffset.Now,
                 Version = new MetadataVersionOptions
                 {
                     Major = 1,
@@ -54,11 +55,11 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     Alias = "1.2.3-rc01"
                 }
             });
-
+            
             app.UseHealthCheck(new HealthCheckOptions
             {
                 Path = "_health",
-                IndentJson = true,
+                IndentJson = env.IsDevelopment(),
                 StringEnum = true
             });
 
