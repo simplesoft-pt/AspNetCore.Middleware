@@ -13,7 +13,7 @@
         /// <param name="patch"></param>
         /// <param name="revision"></param>
         /// <param name="alias"></param>
-        public MetadataVersionModel(uint major, uint minor, uint patch, uint revision, string alias)
+        public MetadataVersionModel(uint major, uint? minor = null, uint? patch = null, uint? revision = null, string alias = null)
         {
             Major = major;
             Minor = minor;
@@ -30,17 +30,17 @@
         /// <summary>
         /// Minor version
         /// </summary>
-        public uint Minor { get; }
+        public uint? Minor { get; }
 
         /// <summary>
         /// Patch version
         /// </summary>
-        public uint Patch { get; }
+        public uint? Patch { get; }
 
         /// <summary>
         /// Revision version
         /// </summary>
-        public uint Revision { get; }
+        public uint? Revision { get; }
 
         /// <summary>
         /// Version alias

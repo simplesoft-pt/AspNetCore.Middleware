@@ -13,21 +13,21 @@
         /// <summary>
         /// Minor version
         /// </summary>
-        public uint Minor { get; set; }
+        public uint? Minor { get; set; }
 
         /// <summary>
         /// Patch version
         /// </summary>
-        public uint Patch { get; set; }
+        public uint? Patch { get; set; }
 
         /// <summary>
         /// Revision version
         /// </summary>
-        public uint Revision { get; set; }
+        public uint? Revision { get; set; }
 
         /// <summary>
         /// Version alias
         /// </summary>
-        public string Alias { get; set; } = "0.0.0";
+        public string Alias { get; set; }
     }
 }

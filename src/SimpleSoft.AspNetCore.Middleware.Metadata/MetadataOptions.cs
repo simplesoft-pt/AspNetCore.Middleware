@@ -50,19 +50,24 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         public bool IndentJson { get; set; } = true;
 
         /// <summary>
+        /// Exclude null properties? Defaults to 'false'.
+        /// </summary>
+        public bool IncludeNullProperties { get; set; } = false;
+
+        /// <summary>
         /// The API name. Defaults to entry assembly name.
         /// </summary>
         public string Name { get; set; } = DefaultName;
 
         /// <summary>
-        /// The API environment. Defaults to null.
+        /// The API environment. Defaults to 'null'.
         /// </summary>
         public string Environment { get; set; }
 
         /// <summary>
         /// The API startup date and time. Defaults to this class first static initialization date and time.
         /// </summary>
-        public DateTimeOffset StartedOn { get; set; } = DefaultStartedOn;
+        public DateTimeOffset? StartedOn { get; set; } = DefaultStartedOn;
 
         /// <summary>
         /// The API version. Defaults to entry assembly file and product versions.

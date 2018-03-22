@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
 {
@@ -47,7 +48,13 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
 
             context.Response.Clear();
             context.Response.StatusCode = 200;
-            return context.Response.WriteJsonAsync(metadata, Options.IndentJson);
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None,
+                NullValueHandling = Options.IncludeNullProperties ? NullValueHandling.Include : NullValueHandling.Ignore
+            };
+            return context.Response.WriteJsonAsync(metadata, jsonSettings);
         }
 
         /// <summary>

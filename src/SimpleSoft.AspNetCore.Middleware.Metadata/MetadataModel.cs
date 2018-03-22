@@ -14,7 +14,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <param name="environment"></param>
         /// <param name="startedOn"></param>
         /// <param name="version"></param>
-        public MetadataModel(string name, string environment, DateTimeOffset startedOn, MetadataVersionModel version)
+        public MetadataModel(string name, string environment, DateTimeOffset? startedOn = null, MetadataVersionModel version = null)
         {
             Name = name;
             Environment = environment;
@@ -35,7 +35,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <summary>
         /// The API startup date and time
         /// </summary>
-        public DateTimeOffset StartedOn { get; }
+        public DateTimeOffset? StartedOn { get; }
 
         /// <summary>
         /// The API version
