@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
 
 namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
@@ -12,6 +15,22 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+
+            services
+                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception", async ct =>
+                {
+                    await Task.Delay(200, ct);
+                    if (DateTimeOffset.Now.Millisecond % 2 == 0)
+                        throw new Exception("Random health check exception");
+                    return HealthCheckStatus.Green;
+                }, s.GetService<ILogger<DelegatingHealthCheck>>()))
+                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception", async ct =>
+                {
+                    await Task.Delay(200, ct);
+                    if (DateTimeOffset.Now.Millisecond % 2 == 0)
+                        throw new Exception("Random health check exception");
+                    return HealthCheckStatus.Green;
+                }, s.GetService<ILogger<DelegatingHealthCheck>>(), true));
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -34,6 +53,13 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     Revision = 4,
                     Alias = "1.2.3-rc01"
                 }
+            });
+
+            app.UseHealthCheck(new HealthCheckOptions
+            {
+                Path = "_health",
+                IndentJson = true,
+                StringEnum = true
             });
 
             app.Run(async context =>
