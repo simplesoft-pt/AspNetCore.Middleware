@@ -20,7 +20,9 @@ namespace Microsoft.AspNetCore.Builder
         /// <exception cref="ArgumentNullException"></exception>
         public static IApplicationBuilder UseMetadata(this IApplicationBuilder app)
         {
-            return app.UseMetadata(app.ApplicationServices.GetService<IOptions<MetadataOptions>>());
+            return app.UseMetadata(
+                app.ApplicationServices.GetService<IOptions<MetadataOptions>>() ??
+                Options.Create(new MetadataOptions()));
         }
 
         /// <summary>

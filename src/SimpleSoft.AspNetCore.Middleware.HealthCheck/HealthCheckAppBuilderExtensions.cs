@@ -20,7 +20,9 @@ namespace Microsoft.AspNetCore.Builder
         /// <exception cref="ArgumentNullException"></exception>
         public static IApplicationBuilder UseHealthCheck(this IApplicationBuilder app)
         {
-            return app.UseHealthCheck(app.ApplicationServices.GetService<IOptions<HealthCheckOptions>>());
+            return app.UseHealthCheck(
+                app.ApplicationServices.GetService<IOptions<HealthCheckOptions>>() ??
+                Options.Create(new HealthCheckOptions()));
         }
 
         /// <summary>
