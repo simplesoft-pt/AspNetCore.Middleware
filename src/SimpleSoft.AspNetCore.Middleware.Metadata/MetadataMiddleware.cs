@@ -43,7 +43,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
 
             Logger.LogDebug("Returning application metadata");
 
-            var metadata = GetMetadata();
+            var metadata = GetMetadata(context);
 
             context.Response.Clear();
             context.Response.StatusCode = 200;
@@ -55,7 +55,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// as the JSON response.
         /// </summary>
         /// <returns>The metadata instance</returns>
-        protected virtual MetadataModel GetMetadata()
+        protected virtual MetadataModel GetMetadata(HttpContext context)
         {
             var version = Options.Version == null
                 ? null
