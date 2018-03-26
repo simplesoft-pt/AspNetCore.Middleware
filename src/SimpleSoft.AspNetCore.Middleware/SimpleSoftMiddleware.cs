@@ -48,9 +48,11 @@ namespace SimpleSoft.AspNetCore.Middleware
             if (Options.BeforeInvoke != null)
                 await Options.BeforeInvoke(context);
 
-            if (context.Response.HasStarted)
+            if (context.Response.HasStarted || context.RequestAborted.IsCancellationRequested)
             {
-                Logger.LogWarning("The response has already started, the middleware will not be executed.");
+                Logger.LogWarning(
+                    "Middleware will not be executed [Response.HasStarted={responseHasStarted} Request.Aborted={requestAborted}]",
+                    context.Response.HasStarted, context.RequestAborted.IsCancellationRequested);
                 return;
             }
 
