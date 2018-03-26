@@ -35,8 +35,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-                app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage();
 
             app.UseMetadata(new MetadataOptions
             {
