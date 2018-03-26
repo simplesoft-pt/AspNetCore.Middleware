@@ -39,6 +39,15 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             app.UseMetadata(new MetadataOptions
             {
+                BeforeInvoke = ctx =>
+                {
+                    //  example: only available via localhost, aborting the request if false
+                    if (IsLocalhostRequest(ctx))
+                        return Task.CompletedTask;
+                    
+                    ctx.Abort();
+                    return Task.CompletedTask;
+                },
                 Path = "_meta",
                 IndentJson = env.IsDevelopment(),
                 IncludeNullProperties = true,
@@ -54,9 +63,28 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     Alias = "1.2.3-rc01"
                 }
             });
-            
+
             app.UseHealthCheck(new HealthCheckOptions
             {
+                BeforeInvoke = ctx =>
+                {
+                    //  example: only available via localhost or to an admin
+                    //  returning a client error status code when false
+                    if (IsLocalhostRequest(ctx))
+                        return Task.CompletedTask;
+                    
+                    if (ctx.User.Identity.IsAuthenticated)
+                    {
+                        if (ctx.User.IsInRole("admin"))
+                            return Task.CompletedTask;
+
+                        ctx.Response.StatusCode = 403;
+                        return ctx.Response.WriteAsync("Forbidden");
+                    }
+
+                    ctx.Response.StatusCode = 401;
+                    return ctx.Response.WriteAsync("Unauthorized");
+                },
                 Path = "_health",
                 IndentJson = env.IsDevelopment(),
                 StringEnum = true
@@ -67,6 +95,12 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                 await context.Response.WriteAsync(
                     "This is an example API for SimpleSoft.AspNetCore.Middleware!");
             });
+        }
+
+        private bool IsLocalhostRequest(HttpContext ctx)
+        {
+            var host = ctx.Request.Host.Host;
+            return "localhost".Equals(host) || "127.0.0.1".Equals(host);
         }
     }
 }
