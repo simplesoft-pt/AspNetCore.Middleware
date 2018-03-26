@@ -97,7 +97,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             });
         }
 
-        private bool IsLocalhostRequest(HttpContext ctx)
+        private static bool IsLocalhostRequest(HttpContext ctx)
         {
             var host = ctx.Request.Host.Host;
             return "localhost".Equals(host) || "127.0.0.1".Equals(host);
