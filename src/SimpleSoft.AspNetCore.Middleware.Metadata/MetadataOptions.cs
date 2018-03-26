@@ -7,7 +7,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
     /// <summary>
     /// Metadata middleware options
     /// </summary>
-    public class MetadataOptions
+    public class MetadataOptions : SimpleSoftMiddlewareOptions
     {
         private static readonly string DefaultName;
         private static readonly DateTimeOffset DefaultStartedOn;

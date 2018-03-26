@@ -3,7 +3,7 @@
     /// <summary>
     /// Health check middleware options
     /// </summary>
-    public class HealthCheckOptions
+    public class HealthCheckOptions : SimpleSoftMiddlewareOptions
     {
         /// <summary>
         /// Path for which the middleware responds. Defaults to 'api/_health'.

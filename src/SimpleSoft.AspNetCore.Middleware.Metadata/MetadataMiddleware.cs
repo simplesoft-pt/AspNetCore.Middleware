@@ -21,27 +21,19 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <exception cref="ArgumentNullException"></exception>
         public MetadataMiddleware(RequestDelegate next,
             IOptions<MetadataOptions> options, ILogger<MetadataMiddleware> logger = null) 
-            : base(next, logger)
+            : base(next, options, logger)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-
-            Options = options.Value;
+            Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
         /// <summary>
         /// The middleware options
         /// </summary>
-        protected MetadataOptions Options { get; }
+        protected new MetadataOptions Options { get; }
 
         /// <inheritdoc />
-        public override Task Invoke(HttpContext context)
+        protected override Task OnInvoke(HttpContext context)
         {
-            if (context.Response.HasStarted)
-            {
-                Logger.LogWarning("The response has already started, the middleware will not be executed.");
-                return Task.CompletedTask;
-            }
-
             Logger.LogDebug("Returning application metadata");
 
             var metadata = GetMetadata(context);
