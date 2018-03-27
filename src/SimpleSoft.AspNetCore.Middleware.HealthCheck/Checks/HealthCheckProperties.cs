@@ -28,7 +28,7 @@ using System;
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
     /// <summary>
-    /// The health check options
+    /// The health check properties.
     /// </summary>
     public class HealthCheckProperties
     {

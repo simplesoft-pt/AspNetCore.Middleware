@@ -43,20 +43,6 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// Creates a new instance.
         /// </summary>
-        /// <param name="name">The health check name</param>
-        /// <param name="logger">An optional logger instance</param>
-        /// <param name="required">Is the health check required?</param>
-        /// <param name="tags">The collection of tags</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        protected HealthCheck(string name, ILogger<HealthCheck> logger = null, bool required = false, params string[] tags)
-            : this(new HealthCheckProperties(name, required, tags), logger)
-        {
-
-        }
-
-        /// <summary>
-        /// Creates a new instance.
-        /// </summary>
         /// <param name="properties">The health check properties</param>
         /// <param name="logger">An optional logger instance</param>
         /// <exception cref="ArgumentNullException"></exception>
