@@ -10,8 +10,8 @@ namespace SimpleSoft.AspNetCore.Middleware
     public class SimpleSoftMiddlewareOptions
     {
         /// <summary>
-        /// Invoked before the delegate logic. If a response written,
-        /// the delegate won't execute.
+        /// Invoked before the delegate logic. If a response written or the request is aborted,
+        /// the middleware will stop the execution.
         /// </summary>
         public Func<HttpContext, Task> BeforeInvoke { get; set; }
     }
