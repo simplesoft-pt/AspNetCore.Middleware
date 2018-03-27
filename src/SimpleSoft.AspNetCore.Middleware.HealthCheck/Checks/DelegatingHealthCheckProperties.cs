@@ -25,35 +25,34 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 // ReSharper disable once CheckNamespace
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
     /// <summary>
-    /// Health check thar invokes a funcion to calculate the current <see cref="HealthCheckStatus"/>.
-    /// Exceptions thrown by the function will set the status to <see cref="HealthCheckStatus.Red"/>.
+    /// The delegate health check properties.
     /// </summary>
-    public class DelegatingHealthCheck : HealthCheck
+    public class DelegatingHealthCheckProperties : HealthCheckProperties
     {
         /// <summary>
         /// Creates a new instance.
         /// </summary>
-        /// <param name="properties">The health check properties</param>
-        /// <param name="logger">An optional logger instance</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="action">The action to execute to get the health check status</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public DelegatingHealthCheck(DelegatingHealthCheckProperties properties, ILogger<DelegatingHealthCheck> logger = null) 
-            : base(properties, logger)
+        public DelegatingHealthCheckProperties(
+            string name, Func<CancellationToken, Task<HealthCheckStatus>> action, 
+            bool required = false, params string[] tags) 
+            : base(name, required, tags)
         {
-            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            Action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
         /// <summary>
-        /// The delegate health check properties
+        /// The action to execute to get the health check status
         /// </summary>
-        protected new DelegatingHealthCheckProperties Properties { get; }
-
-        /// <inheritdoc />
-        public override Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct) => Properties.Action(ct);
+        public Func<CancellationToken, Task<HealthCheckStatus>> Action { get; }
     }
 }

@@ -17,20 +17,22 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             services.AddRouting();
 
             services
-                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception", async ct =>
-                {
-                    await Task.Delay(200, ct);
-                    if (DateTimeOffset.Now.Millisecond % 2 == 0)
-                        throw new Exception("Random health check exception");
-                    return HealthCheckStatus.Green;
-                }, s.GetService<ILogger<DelegatingHealthCheck>>()))
-                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck("random-exception-required", async ct =>
-                {
-                    await Task.Delay(200, ct);
-                    if (DateTimeOffset.Now.Millisecond % 2 == 0)
-                        throw new Exception("Random health check exception");
-                    return HealthCheckStatus.Green;
-                }, s.GetService<ILogger<DelegatingHealthCheck>>(), true));
+                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck(new DelegatingHealthCheckProperties(
+                    "random-exception", async ct =>
+                    {
+                        await Task.Delay(200, ct);
+                        if (DateTimeOffset.Now.Millisecond % 2 == 0)
+                            throw new Exception("Random health check exception");
+                        return HealthCheckStatus.Green;
+                    }), s.GetService<ILogger<DelegatingHealthCheck>>()))
+                .AddScoped<IHealthCheck>(s => new DelegatingHealthCheck(new DelegatingHealthCheckProperties(
+                    "random-exception-required", async ct =>
+                    {
+                        await Task.Delay(200, ct);
+                        if (DateTimeOffset.Now.Millisecond % 2 == 0)
+                            throw new Exception("Random health check exception");
+                        return HealthCheckStatus.Green;
+                    }, true), s.GetService<ILogger<DelegatingHealthCheck>>()));
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
