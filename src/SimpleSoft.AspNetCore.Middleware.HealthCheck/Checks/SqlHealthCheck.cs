@@ -24,7 +24,6 @@
 
 using System;
 using System.Data;
-using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -37,42 +36,43 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public class SqlHealthCheck : HealthCheck
     {
-        private readonly Func<DbConnection> _connectionBuilder;
-        private readonly string _sql;
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="properties">The health check properties</param>
+        /// <param name="logger">An optional logger instance</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public SqlHealthCheck(SqlHealthCheckProperties properties, ILogger<SqlHealthCheck> logger = null) 
+            : base(properties, logger)
+        {
+            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+        }
 
         /// <summary>
-        /// Creates a new instance
+        /// The SQL health check properties
         /// </summary>
-        /// <param name="name">The health check name</param>
-        /// <param name="connectionBuilder">The connection builder function</param>
-        /// <param name="sql">The SQL to be executed agains the database</param>
-        /// <param name="logger">An optional logger instance</param>
-        /// <param name="required">Is the health check required?</param>
-        /// <param name="tags">The collection of tags</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public SqlHealthCheck(
-            string name, Func<DbConnection> connectionBuilder, string sql = "SELECT 1",
-            ILogger<SqlHealthCheck> logger = null, bool required = false, params string[] tags) 
-            : base(name, logger, required, tags)
-        {
-            _connectionBuilder = connectionBuilder ?? throw new ArgumentNullException(nameof(connectionBuilder));
-            _sql = sql ?? throw new ArgumentNullException(nameof(sql));
-        }
+        protected new SqlHealthCheckProperties Properties { get; }
 
         /// <inheritdoc />
         public override async Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct)
         {
             Logger.LogDebug("Accessing the database");
 
-            using (var conn = _connectionBuilder())
+            using (var conn = Properties.ConnectionBuilder())
             {
                 if (conn.State != ConnectionState.Open)
                     await conn.OpenAsync(ct);
 
-                using (var command = conn.CreateCommand())
+                if (Properties.Sql != null)
                 {
-                    command.CommandText = _sql;
-                    await command.ExecuteNonQueryAsync(ct);
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = Properties.Sql;
+                        Logger.LogDebug("Executing database command [Timeout:{timeout}, Type:'{type}', Text:'{text}']",
+                            cmd.CommandTimeout, cmd.CommandType, cmd.CommandText);
+
+                        await cmd.ExecuteNonQueryAsync(ct);
+                    }
                 }
             }
 
