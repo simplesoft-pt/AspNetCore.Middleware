@@ -49,12 +49,27 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="tags">The collection of tags</param>
         /// <exception cref="ArgumentNullException"></exception>
         protected HealthCheck(string name, ILogger<HealthCheck> logger = null, bool required = false, params string[] tags)
+            : this(new HealthCheckProperties(name, required, tags), logger)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Logger = logger ?? NullLogger<HealthCheck>.Instance;
-            Required = required;
-            Tags = tags ?? throw new ArgumentNullException(nameof(tags));
+
         }
+
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
+        /// <param name="properties">The health check properties</param>
+        /// <param name="logger">An optional logger instance</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected HealthCheck(HealthCheckProperties properties, ILogger<HealthCheck> logger = null)
+        {
+            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            Logger = logger ?? NullLogger<HealthCheck>.Instance;
+        }
+
+        /// <summary>
+        /// The health check properties
+        /// </summary>
+        protected virtual HealthCheckProperties Properties { get; }
 
         /// <summary>
         /// The health check logger
@@ -62,16 +77,16 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         protected ILogger Logger { get; }
 
         /// <inheritdoc />
-        public string Name { get; }
+        public string Name => Properties.Name;
 
         /// <inheritdoc />
         public HealthCheckStatus Status { get; protected set; } = HealthCheckStatus.Green;
 
         /// <inheritdoc />
-        public bool Required { get; }
+        public bool Required => Properties.Required;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Tags => Properties.Tags;
 
         /// <inheritdoc />
         public virtual async Task UpdateStatusAsync(CancellationToken ct) => Status = await OnUpdateStatusAsync(ct);
@@ -82,5 +97,46 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
         public virtual Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct) => CachedHealthCheckStatusTask;
+
+        /// <summary>
+        /// The health check options
+        /// </summary>
+        public class HealthCheckProperties
+        {
+            private string[] _tags;
+
+            /// <summary>
+            /// Creates a new instance
+            /// </summary>
+            /// <param name="name">The health check name</param>
+            /// <param name="required">Is the health check required?</param>
+            /// <param name="tags">The collection of tags</param>
+            /// <exception cref="ArgumentNullException"></exception>
+            public HealthCheckProperties(string name, bool required = false, params string[] tags)
+            {
+                Name = name ?? throw new ArgumentNullException(nameof(name));
+                Required = required;
+                Tags = tags ?? throw new ArgumentNullException(nameof(name));
+            }
+
+            /// <summary>
+            /// Health check name
+            /// </summary>
+            public string Name { get; }
+
+            /// <summary>
+            /// Is the health check required? Defaults to false,
+            /// </summary>
+            public bool Required { get; set; }
+
+            /// <summary>
+            /// The collection of tags. Defaults to empty array.
+            /// </summary>
+            public string[] Tags
+            {
+                get => _tags;
+                set => _tags = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
     }
 }
