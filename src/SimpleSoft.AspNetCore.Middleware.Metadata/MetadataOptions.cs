@@ -23,7 +23,6 @@
 #endregion
 
 using System;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
@@ -35,7 +34,6 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
     {
         private static readonly string DefaultName;
         private static readonly DateTimeOffset DefaultStartedOn;
-        private static readonly MetadataVersionOptions DefaultVersionOptions;
 
         static MetadataOptions()
         {
@@ -43,24 +41,6 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
 
             DefaultName = entryAssembly.GetName().Name;
             DefaultStartedOn = DateTimeOffset.Now;
-
-            try
-            {
-                var fvi = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
-
-                DefaultVersionOptions = new MetadataVersionOptions
-                {
-                    Major = (uint) fvi.FileMajorPart,
-                    Minor = (uint) fvi.FileMinorPart,
-                    Patch = (uint) fvi.FileBuildPart,
-                    Revision = (uint) fvi.FilePrivatePart,
-                    Alias = fvi.ProductVersion
-                };
-            }
-            catch (Exception)
-            {
-                DefaultVersionOptions = new MetadataVersionOptions();
-            }
         }
 
         /// <summary>
@@ -96,13 +76,6 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// <summary>
         /// The API version. Defaults to entry assembly file and product versions.
         /// </summary>
-        public MetadataVersionOptions Version { get; set; } = new MetadataVersionOptions
-        {
-            Major = DefaultVersionOptions.Major,
-            Minor = DefaultVersionOptions.Minor,
-            Patch = DefaultVersionOptions.Patch,
-            Revision = DefaultVersionOptions.Revision,
-            Alias = DefaultVersionOptions.Alias
-        };
+        public MetadataVersionOptions Version { get; set; } = new MetadataVersionOptions();
     }
 }

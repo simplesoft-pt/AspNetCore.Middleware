@@ -22,6 +22,10 @@
 // SOFTWARE.
 #endregion
 
+using System;
+using System.Diagnostics;
+using System.Reflection;
+
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
 {
     /// <summary>
@@ -29,29 +33,56 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
     /// </summary>
     public class MetadataVersionOptions
     {
-        /// <summary>
-        /// Major version
-        /// </summary>
-        public uint Major { get; set; }
+        private static readonly uint DefaultMajor;
+        private static readonly uint DefaultMinor;
+        private static readonly uint DefaultPatch;
+        private static readonly uint DefaultRevision;
+        private static readonly string DefaultAlias;
+
+        static MetadataVersionOptions()
+        {
+            var entryAssembly = Assembly.GetEntryAssembly();
+
+            try
+            {
+                var fvi = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
+
+                DefaultMajor = (uint) fvi.FileMajorPart;
+                DefaultMinor = (uint) fvi.FileMinorPart;
+                DefaultPatch = (uint) fvi.FileBuildPart;
+                DefaultRevision = (uint) fvi.FilePrivatePart;
+                DefaultAlias = fvi.ProductVersion;
+            }
+            catch (Exception)
+            {
+                DefaultMajor = DefaultMinor = DefaultPatch = DefaultRevision = 0;
+                DefaultAlias = null;
+            }
+        }
 
         /// <summary>
-        /// Minor version
+        /// Major version. Defaults to entry assembly <see cref="FileVersionInfo.FileMajorPart"/>.
         /// </summary>
-        public uint? Minor { get; set; }
+        public uint Major { get; set; } = DefaultMajor;
 
         /// <summary>
-        /// Patch version
+        /// Minor version. Defaults to entry assembly <see cref="FileVersionInfo.FileMinorPart"/>.
         /// </summary>
-        public uint? Patch { get; set; }
+        public uint? Minor { get; set; } = DefaultMinor;
 
         /// <summary>
-        /// Revision version
+        /// Patch version. Defaults to entry assembly <see cref="FileVersionInfo.FileBuildPart"/>.
         /// </summary>
-        public uint? Revision { get; set; }
+        public uint? Patch { get; set; } = DefaultPatch;
 
         /// <summary>
-        /// Version alias
+        /// Revision version. Defaults to entry assembly <see cref="FileVersionInfo.FilePrivatePart"/>.
         /// </summary>
-        public string Alias { get; set; }
+        public uint? Revision { get; set; } = DefaultRevision;
+
+        /// <summary>
+        /// Version alias. Defaults to entry assembly <see cref="FileVersionInfo.ProductVersion"/>.
+        /// </summary>
+        public string Alias { get; set; } = DefaultAlias;
     }
 }
