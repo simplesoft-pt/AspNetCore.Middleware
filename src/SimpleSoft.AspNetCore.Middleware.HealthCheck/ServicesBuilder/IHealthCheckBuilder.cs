@@ -34,6 +34,12 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     public interface IHealthCheckBuilder
     {
         /// <summary>
+        /// Adds the given health check.
+        /// </summary>
+        /// <param name="healthCheck">The health check</param>
+        void Add(IHealthCheck healthCheck);
+
+        /// <summary>
         /// Adds the given type as an health check
         /// </summary>
         /// <typeparam name="T">The health check type</typeparam>

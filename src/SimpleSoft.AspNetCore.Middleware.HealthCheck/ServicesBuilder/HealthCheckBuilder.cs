@@ -37,6 +37,12 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
+        public void Add(IHealthCheck healthCheck)
+        {
+            if (healthCheck == null) throw new ArgumentNullException(nameof(healthCheck));
+            _services.AddSingleton(healthCheck);
+        }
+
         public void Add<T>() where T : class, IHealthCheck
         {
             _services.AddScoped<IHealthCheck, T>();
