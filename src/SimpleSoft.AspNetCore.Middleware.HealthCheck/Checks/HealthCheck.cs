@@ -37,8 +37,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public abstract class HealthCheck : IHealthCheck
     {
-        private static readonly Task<HealthCheckStatus> CachedHealthCheckStatusTask =
-            Task.FromResult(HealthCheckStatus.Green);
+        private static readonly Task<HealthCheckStatus> CachedHealthCheckStatusTask = Task.FromResult(HealthCheckStatus.Green);
+        private static readonly string[] EmptyTags = new string[0];
+
+        private IReadOnlyCollection<string> _cachedTags;
 
         /// <summary>
         /// Creates a new instance.
@@ -72,7 +74,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         public bool Required => Properties.Required;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Tags => Properties.Tags;
+        public IReadOnlyCollection<string> Tags => GetTags();
 
         /// <inheritdoc />
         public virtual async Task UpdateStatusAsync(CancellationToken ct) => Status = await OnUpdateStatusAsync(ct);
@@ -83,5 +85,21 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
         public virtual Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct) => CachedHealthCheckStatusTask;
+
+        private IReadOnlyCollection<string> GetTags()
+        {
+            if (Properties.Tags.Count == 0)
+                return EmptyTags;
+
+            if (_cachedTags == null)
+            {
+                var tags = new string[Properties.Tags.Count];
+                for (var i = 0; i < Properties.Tags.Count; i++)
+                    tags[i] = Properties.Tags[i];
+                _cachedTags = tags;
+            }
+
+            return _cachedTags;
+        }
     }
 }

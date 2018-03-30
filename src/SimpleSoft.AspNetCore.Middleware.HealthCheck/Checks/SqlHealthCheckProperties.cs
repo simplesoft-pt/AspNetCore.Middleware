@@ -49,6 +49,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         {
             ConnectionBuilder = connectionBuilder ?? throw new ArgumentNullException(nameof(connectionBuilder));
             Sql = sql;
+            Tags.Add("database");
+            Tags.Add("sql");
         }
 
         /// <summary>

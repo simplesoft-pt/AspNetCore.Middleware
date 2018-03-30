@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
@@ -32,7 +33,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public class HealthCheckProperties
     {
-        private string[] _tags;
+        private readonly List<string> _tags;
 
         /// <summary>
         /// Creates a new instance
@@ -43,9 +44,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <exception cref="ArgumentNullException"></exception>
         public HealthCheckProperties(string name, bool required = false, params string[] tags)
         {
+            if (tags == null)
+                throw new ArgumentNullException(nameof(tags));
+
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Required = required;
-            Tags = tags ?? throw new ArgumentNullException(nameof(name));
+            _tags = new List<string>(tags.Length + 4);
+            _tags.AddRange(tags);
         }
 
         /// <summary>
@@ -61,10 +66,6 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// The collection of tags. Defaults to empty array.
         /// </summary>
-        public string[] Tags
-        {
-            get => _tags;
-            set => _tags = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        public IList<string> Tags => _tags;
     }
 }
