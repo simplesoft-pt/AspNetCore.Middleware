@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="required">Is the health check required?</param>
         /// <param name="tags">The collection of tags</param>
         /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IHealthCheckBuilder AddDelegate(this IHealthCheckBuilder builder,
             string name, Func<CancellationToken, Task<HealthCheckStatus>> action,
             bool required = false, params string[] tags)
@@ -56,8 +58,9 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Adds a <see cref="DelegatingHealthCheck"/> to the services.
         /// </summary>
         /// <param name="builder">The health check builder</param>
-        /// <param name="properties">The delegate properties</param>
+        /// <param name="properties">The health check properties</param>
         /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IHealthCheckBuilder AddDelegate(this IHealthCheckBuilder builder, DelegatingHealthCheckProperties properties)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -67,6 +70,72 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             {
                 s.AddSingleton<IHealthCheck>(p =>
                     new DelegatingHealthCheck(properties, p.GetService<ILogger<DelegatingHealthCheck>>()));
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="SqlHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="connectionBuilder">The connection builder function</param>
+        /// <param name="sql">The SQL to be executed agains the database. If null or empty, the connection will only be open.</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddSql(this IHealthCheckBuilder builder,
+            string name, Func<DbConnection> connectionBuilder, string sql = null,
+            bool required = false, params string[] tags)
+        {
+            return builder.AddSql(new SqlHealthCheckProperties(name, connectionBuilder, sql, required, tags));
+        }
+
+        /// <summary>
+        /// Adds a <see cref="SqlHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="connectionBuilder">The connection builder function</param>
+        /// <param name="sql">The SQL to be executed agains the database. If null or empty, the connection will only be open.</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddSql(this IHealthCheckBuilder builder,
+            string name, Func<IServiceProvider, DbConnection> connectionBuilder, string sql = null,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (connectionBuilder == null) throw new ArgumentNullException(nameof(connectionBuilder));
+
+            builder.Register(s =>
+            {
+                s.AddScoped<IHealthCheck>(p =>
+                    new SqlHealthCheck(
+                        new SqlHealthCheckProperties(name, () => connectionBuilder(p), sql, required, tags),
+                        p.GetService<ILogger<SqlHealthCheck>>()));
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="SqlHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="properties">The health check properties</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddSql(this IHealthCheckBuilder builder, SqlHealthCheckProperties properties)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+
+            builder.Register(s =>
+            {
+                s.AddScoped<IHealthCheck>(p =>
+                    new SqlHealthCheck(properties, p.GetService<ILogger<SqlHealthCheck>>()));
             });
             return builder;
         }
