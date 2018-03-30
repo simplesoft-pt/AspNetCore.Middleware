@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,20 +18,17 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             services.AddHealthCheck(cfg =>
             {
-                cfg.AddDelegate("random-exception", async ct =>
-                {
-                    await Task.Delay(200, ct);
-                    if (DateTimeOffset.Now.Millisecond % 2 == 0)
-                        throw new Exception("Random health check exception");
-                    return HealthCheckStatus.Green;
-                }, false, "test", "random", "custom");
-                cfg.AddDelegate("random-exception-required", async ct =>
+                cfg.AddSql("db-master",
+                    () => new SqlConnection("Data Source=.;Database=Master;Integrated Security=true"),
+                    "SELECT 1", true, "sql-server");
+
+                cfg.AddDelegate("random", async ct =>
                 {
                     await Task.Delay(200, ct);
                     if (DateTimeOffset.Now.Millisecond % 3 == 0)
                         throw new Exception("Random health check exception");
                     return HealthCheckStatus.Green;
-                }, true, "test", "random", "custom");
+                }, false, "custom", "example");
             });
         }
         
