@@ -22,11 +22,11 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     () => new SqlConnection("Data Source=.;Database=Master;Integrated Security=true"),
                     "SELECT 1", true, "sql-server");
 
-                cfg.AddDelegate("random", async ct =>
+                cfg.AddDelegate("example-custom", async ct =>
                 {
                     await Task.Delay(200, ct);
                     if (DateTimeOffset.Now.Millisecond % 3 == 0)
-                        throw new Exception("Random health check exception");
+                        throw new Exception("Example health check exception");
                     return HealthCheckStatus.Green;
                 }, false, "custom", "example");
             });
