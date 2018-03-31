@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.Data.MySqlClient;
 using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
 
@@ -18,17 +19,21 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             services.AddHealthCheck(cfg =>
             {
-                cfg.AddSql("db-master",
-                    () => new SqlConnection("Data Source=.;Database=Master;Integrated Security=true"),
+                cfg.AddSql("db-sql-server",
+                    () => new SqlConnection("Data Source=localhost;Database=Master;Integrated Security=true"),
                     "SELECT 1", true, "sql-server");
 
-                cfg.AddDelegate("example-custom", async ct =>
+                cfg.AddSql("db-mysql",
+                    () => new MySqlConnection("Server=localhost;Database=mysql;IntegratedSecurity=yes"),
+                    "SELECT 1", false, "mysql");
+
+                cfg.AddDelegate("example-delegate", async ct =>
                 {
                     await Task.Delay(200, ct);
                     if (DateTimeOffset.Now.Millisecond % 3 == 0)
                         throw new Exception("Example health check exception");
                     return HealthCheckStatus.Green;
-                }, false, "custom", "example");
+                }, false, "custom");
             });
         }
         
@@ -68,7 +73,6 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                 BeforeInvoke = ctx =>
                 {
                     //  example: only available via localhost or to an admin
-                    //  returning a client error status code when false
                     if (IsLocalhostRequest(ctx))
                         return Task.CompletedTask;
                     
