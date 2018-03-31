@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
+
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.18001")]
+[assembly: AssemblyProduct("1.2.0-rc01")]
 
 namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 {
@@ -56,16 +61,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                 IndentJson = env.IsDevelopment(),
                 IncludeNullProperties = true,
                 Name = "SimpleSoft Middleware ExampleApi",
-                Environment = env.EnvironmentName,
-                StartedOn = DateTimeOffset.Now,
-                Version = new MetadataVersionOptions
-                {
-                    Major = 1,
-                    Minor = 2,
-                    Patch = 3,
-                    Revision = 4,
-                    Alias = "1.2.3-rc01"
-                }
+                Environment = env.EnvironmentName
             });
 
             app.UseHealthCheck(new HealthCheckOptions
