@@ -10,6 +10,7 @@ using MySql.Data.MySqlClient;
 using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
 
+//  example: will be used by the metadata endpoint by default
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.2.0.18001")]
 [assembly: AssemblyProduct("1.2.0-rc01")]
@@ -91,8 +92,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             app.Run(async context =>
             {
-                await context.Response.WriteAsync(
-                    "This is an example API for SimpleSoft.AspNetCore.Middleware!");
+                await context.Response.WriteAsync(IndexHtml);
             });
         }
 
@@ -101,5 +101,24 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             var host = ctx.Request.Host.Host;
             return "localhost".Equals(host) || "127.0.0.1".Equals(host);
         }
+
+        private const string IndexHtml = @"
+<html>
+    <head>
+        <title>SimpleSoft - AspNetCore Middleware Examples</title>
+        <link rel=""stylesheet"" href=""https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"" integrity=""sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"" crossorigin=""anonymous"">
+    </head>
+    <body>
+        <div class=""container"">
+            <h2>AspNetCore Middleware Examples</h2><br/>
+            <p>This is an example API for SimpleSoft.AspNetCore.Middleware!</p>
+            <p>Example endpoints:</p>
+            <ul>
+                <li><a href=""/_meta"" target=""_blank"">Metadata (GET /_meta)</a></li>
+                <li><a href=""/_health"" target=""_blank"">Health Checks (GET /_health)</a></li>
+            </ul>
+        </div>
+    </body>
+</html>";
     }
 }
