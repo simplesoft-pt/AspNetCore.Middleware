@@ -174,5 +174,71 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         }
 
         #endregion
+
+        #region HTTP
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="url">The url address</param>
+        /// <param name="timeoutInMs">The request timeout</param>
+        /// <param name="ensureSuccessfulStatus">Ensure a successful HTTP status code of 2XX?</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder,
+            string name, string url, int timeoutInMs = 5000, bool ensureSuccessfulStatus = true,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.AddHttp(name, new Uri(url), timeoutInMs, ensureSuccessfulStatus, required, tags);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="url">The url address</param>
+        /// <param name="timeoutInMs">The request timeout</param>
+        /// <param name="ensureSuccessfulStatus">Ensure a successful HTTP status code of 2XX?</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder,
+            string name, Uri url, int timeoutInMs = 5000, bool ensureSuccessfulStatus = true,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.AddHttp(new HttpHealthCheckProperties(name, url, timeoutInMs, ensureSuccessfulStatus, required, tags));
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="properties">The health check properties</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder, HttpHealthCheckProperties properties)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+
+            builder.Register(s =>
+            {
+                s.AddSingleton<IHealthCheck>(p =>
+                    new HttpHealthCheck(properties, p.GetService<ILogger<HttpHealthCheck>>()));
+            });
+            return builder;
+        }
+
+        #endregion
     }
 }
