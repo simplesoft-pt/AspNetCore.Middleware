@@ -30,10 +30,19 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     "SELECT 1", true, "sql-server");
 
                 cfg.AddSql("db-mysql",
-                    () => new MySqlConnection("Server=localhost;Database=mysql;IntegratedSecurity=yes"),
+                    () => new MySqlConnection("Server=localhost;Database=mysql;Integrated Security=yes"),
                     "SELECT 1", false, "mysql");
 
-                cfg.AddDelegate("example-delegate", async ct =>
+                cfg.AddHttp("http-stat-200",
+                    "https://httpstat.us/200", 2000, true, true, "httpstat");
+
+                cfg.AddHttp("http-stat-500", 
+                    "https://httpstat.us/500", 2000, true, true, "httpstat");
+
+                cfg.AddHttp("http-stat-timeout",
+                    "https://httpstat.us/200?sleep=5000", 2000, true, true, "httpstat");
+
+                cfg.AddDelegate("delegate", async ct =>
                 {
                     await Task.Delay(200, ct);
                     if (DateTimeOffset.Now.Millisecond % 3 == 0)
