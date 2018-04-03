@@ -37,6 +37,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public static class HealthCheckBuilderExtensions
     {
+        #region Delegate
+
         /// <summary>
         /// Adds a <see cref="DelegatingHealthCheck"/> to the services.
         /// </summary>
@@ -58,6 +60,33 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Adds a <see cref="DelegatingHealthCheck"/> to the services.
         /// </summary>
         /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="action">The action to execute to get the health check status</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddDelegate(this IHealthCheckBuilder builder,
+            string name, Func<IServiceProvider, CancellationToken, Task<HealthCheckStatus>> action,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            builder.Register(s =>
+            {
+                s.AddScoped<IHealthCheck>(p =>
+                    new DelegatingHealthCheck(
+                        new DelegatingHealthCheckProperties(name, ct => action(p, ct), required, tags),
+                        p.GetService<ILogger<DelegatingHealthCheck>>()));
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="DelegatingHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
         /// <param name="properties">The health check properties</param>
         /// <returns>The builder after changes</returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -73,6 +102,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             });
             return builder;
         }
+
+        #endregion
+
+        #region SQL
 
         /// <summary>
         /// Adds a <see cref="SqlHealthCheck"/> to the services.
@@ -134,10 +167,12 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             builder.Register(s =>
             {
-                s.AddScoped<IHealthCheck>(p =>
+                s.AddSingleton<IHealthCheck>(p =>
                     new SqlHealthCheck(properties, p.GetService<ILogger<SqlHealthCheck>>()));
             });
             return builder;
         }
+
+        #endregion
     }
 }
