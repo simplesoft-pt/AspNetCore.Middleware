@@ -107,10 +107,27 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
-            
+
             return builder.Add(
                 p => new DelegatingHealthCheck(properties, p.GetService<ILogger<DelegatingHealthCheck>>()),
                 ServiceLifetime.Singleton);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="DelegatingHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="propertiesBuilder">The health check properties builder</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddDelegate(this IHealthCheckBuilder builder, 
+            Func<IServiceProvider, DelegatingHealthCheckProperties> propertiesBuilder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (propertiesBuilder == null) throw new ArgumentNullException(nameof(propertiesBuilder));
+
+            return builder.Add(
+                p => new DelegatingHealthCheck(propertiesBuilder(p), p.GetService<ILogger<DelegatingHealthCheck>>()));
         }
 
         #endregion
@@ -176,6 +193,23 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                 ServiceLifetime.Singleton);
         }
 
+        /// <summary>
+        /// Adds a <see cref="SqlHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="propertiesBuilder">The health check properties builder</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddSql(this IHealthCheckBuilder builder, 
+            Func<IServiceProvider, SqlHealthCheckProperties> propertiesBuilder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (propertiesBuilder == null) throw new ArgumentNullException(nameof(propertiesBuilder));
+
+            return builder.Add(
+                p => new SqlHealthCheck(propertiesBuilder(p), p.GetService<ILogger<SqlHealthCheck>>()));
+        }
+
         #endregion
 
         #region HTTP
@@ -237,6 +271,68 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             return builder.Add(
                 p => new HttpHealthCheck(properties, p.GetService<ILogger<HttpHealthCheck>>()),
                 ServiceLifetime.Singleton);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="urlBuilder">The url addres builders</param>
+        /// <param name="timeoutInMs">The request timeout</param>
+        /// <param name="ensureSuccessfulStatus">Ensure a successful HTTP status code of 2XX?</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder,
+            string name, Func<IServiceProvider, string> urlBuilder, int timeoutInMs = 5000, bool ensureSuccessfulStatus = true,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (urlBuilder == null) throw new ArgumentNullException(nameof(urlBuilder));
+
+            return builder.AddHttp(name, p => new Uri(urlBuilder(p)), timeoutInMs, ensureSuccessfulStatus, required, tags);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="name">The health check name</param>
+        /// <param name="urlBuilder">The url address builder</param>
+        /// <param name="timeoutInMs">The request timeout</param>
+        /// <param name="ensureSuccessfulStatus">Ensure a successful HTTP status code of 2XX?</param>
+        /// <param name="required">Is the health check required?</param>
+        /// <param name="tags">The collection of tags</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder,
+            string name, Func<IServiceProvider, Uri> urlBuilder, int timeoutInMs = 5000, bool ensureSuccessfulStatus = true,
+            bool required = false, params string[] tags)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (urlBuilder == null) throw new ArgumentNullException(nameof(urlBuilder));
+
+            return builder.AddHttp(p =>
+                new HttpHealthCheckProperties(name, urlBuilder(p), timeoutInMs, ensureSuccessfulStatus, required, tags));
+        }
+
+        /// <summary>
+        /// Adds a <see cref="HttpHealthCheck"/> to the services.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="propertiesBuilder">The health check properties builder</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder AddHttp(this IHealthCheckBuilder builder,
+            Func<IServiceProvider, HttpHealthCheckProperties> propertiesBuilder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (propertiesBuilder == null) throw new ArgumentNullException(nameof(propertiesBuilder));
+
+            return builder.Add(
+                p => new HttpHealthCheck(propertiesBuilder(p), p.GetService<ILogger<HttpHealthCheck>>()));
         }
 
         #endregion
