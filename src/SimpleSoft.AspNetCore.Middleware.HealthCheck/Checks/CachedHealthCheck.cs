@@ -104,7 +104,23 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
                 k.AbsoluteExpirationRelativeToNow = Properties.Expiration;
 
-                await HealthCheck.UpdateStatusAsync(ct);
+                if (Properties.CacheExceptions)
+                {
+                    try
+                    {
+                        await HealthCheck.UpdateStatusAsync(ct);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogWarning(e, "Inner health check failed but status 'Red' will be cached");
+                        return HealthCheckStatus.Red;
+                    }
+                }
+                else
+                {
+                    await HealthCheck.UpdateStatusAsync(ct);
+                }
+
                 return HealthCheck.Status;
             });
         }

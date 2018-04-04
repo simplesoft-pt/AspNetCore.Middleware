@@ -38,12 +38,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="builder">The health check builder</param>
         /// <param name="cachedBuilder">The builder that will register health checks to be cached</param>
         /// <param name="expiration">The cache expiration</param>
+        /// <param name="cacheExceptions">Cache exceptions thrown by the inner health check?</param>
         /// <returns>The builder after changes</returns>
         /// <exception cref="ArgumentNullException"></exception>
         public static IHealthCheckBuilder AddCached(this IHealthCheckBuilder builder,
-            Action<IHealthCheckBuilder> cachedBuilder, TimeSpan expiration)
+            Action<IHealthCheckBuilder> cachedBuilder, TimeSpan expiration, bool cacheExceptions = true)
         {
-            return builder.AddCached(cachedBuilder, new CachedHealthCheckProperties(expiration));
+            return builder.AddCached(cachedBuilder, new CachedHealthCheckProperties(expiration, cacheExceptions));
         }
 
         /// <summary>
