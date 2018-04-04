@@ -35,7 +35,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// <summary>
     /// Extensions for <see cref="IHealthCheckBuilder"/> instances.
     /// </summary>
-    public static class HealthCheckBuilderExtensions
+    public static partial class HealthCheckBuilderExtensions
     {
         /// <summary>
         /// Adds the health check factory to the <see cref="IHealthCheckBuilder.Descriptors"/> collection.
