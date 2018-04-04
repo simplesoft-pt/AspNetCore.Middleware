@@ -21,7 +21,11 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            //  needed for middleware routes
             services.AddRouting();
+
+            //  needed if using cached health checks
+            services.AddMemoryCache();
 
             services.AddHealthCheck(builder =>
             {
@@ -33,14 +37,17 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                     p => new MySqlConnection("Server=localhost;Database=mysql;Integrated Security=yes"),
                     "SELECT 1", false, "mysql");
 
-                builder.AddHttp("http-stat-200",
-                    "https://httpstat.us/200", 2000, true, true, "httpstat");
+                builder.AddCached(cachedBuilder =>
+                {
+                    cachedBuilder.AddHttp("http-stat-200",
+                        "https://httpstat.us/200", 2000, true, true, "httpstat");
 
-                builder.AddHttp("http-stat-500", 
-                    p => "https://httpstat.us/500", 2000, true, true, "httpstat");
+                    cachedBuilder.AddHttp("http-stat-500",
+                        p => "https://httpstat.us/500", 2000, true, true, "httpstat");
 
-                builder.AddHttp("http-stat-timeout",
-                    new Uri("https://httpstat.us/200?sleep=5000"), 2000, true, true, "httpstat");
+                    cachedBuilder.AddHttp("http-stat-timeout",
+                        new Uri("https://httpstat.us/200?sleep=5000"), 2000, true, true, "httpstat");
+                }, TimeSpan.FromSeconds(30));
 
                 builder.AddDelegate("delegate", async ct =>
                 {
