@@ -33,7 +33,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     {
         private readonly List<IHealthCheckServiceDescriptor> _descriptors = new List<IHealthCheckServiceDescriptor>();
 
-        public IReadOnlyList<IHealthCheckServiceDescriptor> Descriptors => _descriptors;
+        public IReadOnlyCollection<IHealthCheckServiceDescriptor> Descriptors => _descriptors;
 
         public void Add(IHealthCheckServiceDescriptor descriptor)
         {

@@ -35,7 +35,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// Collection of health check descriptors
         /// </summary>
-        IReadOnlyList<IHealthCheckServiceDescriptor> Descriptors { get; }
+        IReadOnlyCollection<IHealthCheckServiceDescriptor> Descriptors { get; }
 
         /// <summary>
         /// Adds a new instance to the <see cref="Descriptors"/> collection.
