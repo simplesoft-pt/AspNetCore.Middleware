@@ -23,10 +23,12 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 // ReSharper disable once CheckNamespace
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
@@ -34,7 +36,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// <summary>
     /// Health check wrapper to cache <see cref="HealthCheckStatus"/>.
     /// </summary>
-    public class CachedHealthCheck : HealthCheck
+    public class CachedHealthCheck : IHealthCheck
     {
         /// <summary>
         /// Creates a new instance.
@@ -44,15 +46,20 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <param name="properties">The health check properties</param>
         /// <param name="logger">An optional logger instance</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CachedHealthCheck(IHealthCheck healthCheck, IMemoryCache cache, CachedHealthCheckProperties properties, ILogger<HealthCheck> logger = null) 
-            : base(properties, logger)
+        public CachedHealthCheck(IHealthCheck healthCheck, IMemoryCache cache, CachedHealthCheckProperties properties, ILogger<CachedHealthCheck> logger = null)
         {
             HealthCheck = healthCheck ?? throw new ArgumentNullException(nameof(healthCheck));
             Cache = cache ?? throw new ArgumentNullException(nameof(cache));
             Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            Logger = logger ?? NullLogger<CachedHealthCheck>.Instance;
 
             CacheKey = nameof(CachedHealthCheck) + "->" + HealthCheck.Name;
         }
+
+        /// <summary>
+        /// The health check logger
+        /// </summary>
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// The health check to cache
@@ -67,7 +74,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// The SQL health check properties
         /// </summary>
-        protected new CachedHealthCheckProperties Properties { get; }
+        protected CachedHealthCheckProperties Properties { get; }
 
         /// <summary>
         /// The cache key
@@ -75,9 +82,21 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         protected string CacheKey { get; }
 
         /// <inheritdoc />
-        public override async Task<HealthCheckStatus> OnUpdateStatusAsync(CancellationToken ct)
+        public string Name => HealthCheck.Name;
+
+        /// <inheritdoc />
+        public HealthCheckStatus Status { get; protected set; } = HealthCheckStatus.Green;
+
+        /// <inheritdoc />
+        public bool Required => HealthCheck.Required;
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<string> Tags => HealthCheck.Tags;
+
+        /// <inheritdoc />
+        public async Task UpdateStatusAsync(CancellationToken ct)
         {
-            var status = await Cache.GetOrCreateAsync(CacheKey, async k =>
+            Status = await Cache.GetOrCreateAsync(CacheKey, async k =>
             {
                 Logger.LogDebug(
                     "Expired cache status. Updating to the most recent status [CacheExpiration:'{expiration}']...",
@@ -88,8 +107,6 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                 await HealthCheck.UpdateStatusAsync(ct);
                 return HealthCheck.Status;
             });
-
-            return status;
         }
     }
 }

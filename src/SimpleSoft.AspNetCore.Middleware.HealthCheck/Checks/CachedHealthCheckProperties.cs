@@ -30,18 +30,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// <summary>
     /// The cached health check properties.
     /// </summary>
-    public class CachedHealthCheckProperties : HealthCheckProperties
+    public class CachedHealthCheckProperties
     {
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="name">The health check name</param>
         /// <param name="expiration">The cache duration</param>
-        /// <param name="required">Is the health check required?</param>
-        /// <param name="tags">The collection of tags</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public CachedHealthCheckProperties(string name, TimeSpan expiration, bool required = false, params string[] tags) 
-            : base(name, required, tags)
+        public CachedHealthCheckProperties(TimeSpan expiration)
         {
             Expiration = expiration;
         }
