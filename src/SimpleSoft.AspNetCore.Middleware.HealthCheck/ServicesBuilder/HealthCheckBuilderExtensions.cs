@@ -37,6 +37,23 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public static class HealthCheckBuilderExtensions
     {
+        /// <summary>
+        /// Adds the health check factory to the <see cref="IHealthCheckBuilder.Descriptors"/> collection.
+        /// </summary>
+        /// <param name="builder">The health check builder</param>
+        /// <param name="factory">The health check factory</param>
+        /// <param name="lifetime">The service lifetime</param>
+        /// <returns>The builder after changes</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IHealthCheckBuilder Add(this IHealthCheckBuilder builder,
+            Func<IServiceProvider, IHealthCheck> factory, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Add(new HealthCheckServiceDescriptor(factory, lifetime));
+            return builder;
+        }
+
         #region Delegate
 
         /// <summary>
@@ -73,14 +90,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (action == null) throw new ArgumentNullException(nameof(action));
 
-            builder.Register(s =>
-            {
-                s.AddScoped<IHealthCheck>(p =>
-                    new DelegatingHealthCheck(
-                        new DelegatingHealthCheckProperties(name, ct => action(p, ct), required, tags),
-                        p.GetService<ILogger<DelegatingHealthCheck>>()));
-            });
-            return builder;
+            return builder.Add(p =>
+                new DelegatingHealthCheck(
+                    new DelegatingHealthCheckProperties(name, ct => action(p, ct), required, tags),
+                    p.GetService<ILogger<DelegatingHealthCheck>>()));
         }
 
         /// <summary>
@@ -94,13 +107,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
-
-            builder.Register(s =>
-            {
-                s.AddSingleton<IHealthCheck>(p =>
-                    new DelegatingHealthCheck(properties, p.GetService<ILogger<DelegatingHealthCheck>>()));
-            });
-            return builder;
+            
+            return builder.Add(
+                p => new DelegatingHealthCheck(properties, p.GetService<ILogger<DelegatingHealthCheck>>()),
+                ServiceLifetime.Singleton);
         }
 
         #endregion
@@ -143,14 +153,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (connectionBuilder == null) throw new ArgumentNullException(nameof(connectionBuilder));
 
-            builder.Register(s =>
-            {
-                s.AddScoped<IHealthCheck>(p =>
-                    new SqlHealthCheck(
-                        new SqlHealthCheckProperties(name, () => connectionBuilder(p), sql, required, tags),
-                        p.GetService<ILogger<SqlHealthCheck>>()));
-            });
-            return builder;
+            return builder.Add(p =>
+                new SqlHealthCheck(
+                    new SqlHealthCheckProperties(name, () => connectionBuilder(p), sql, required, tags),
+                    p.GetService<ILogger<SqlHealthCheck>>()));
         }
 
         /// <summary>
@@ -165,12 +171,9 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            builder.Register(s =>
-            {
-                s.AddSingleton<IHealthCheck>(p =>
-                    new SqlHealthCheck(properties, p.GetService<ILogger<SqlHealthCheck>>()));
-            });
-            return builder;
+            return builder.Add(
+                p => new SqlHealthCheck(properties, p.GetService<ILogger<SqlHealthCheck>>()),
+                ServiceLifetime.Singleton);
         }
 
         #endregion
@@ -231,12 +234,9 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            builder.Register(s =>
-            {
-                s.AddSingleton<IHealthCheck>(p =>
-                    new HttpHealthCheck(properties, p.GetService<ILogger<HttpHealthCheck>>()));
-            });
-            return builder;
+            return builder.Add(
+                p => new HttpHealthCheck(properties, p.GetService<ILogger<HttpHealthCheck>>()),
+                ServiceLifetime.Singleton);
         }
 
         #endregion

@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
@@ -30,34 +31,23 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
     internal class HealthCheckBuilder : IHealthCheckBuilder
     {
-        private readonly IServiceCollection _services;
+        private readonly List<IHealthCheckServiceDescriptor> _descriptors = new List<IHealthCheckServiceDescriptor>();
 
-        public HealthCheckBuilder(IServiceCollection services)
+        public IReadOnlyList<IHealthCheckServiceDescriptor> Descriptors => _descriptors;
+
+        public void Add(IHealthCheckServiceDescriptor descriptor)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            if (descriptor == null) throw new ArgumentNullException(nameof(descriptor));
+            _descriptors.Add(descriptor);
         }
 
-        public void Add(IHealthCheck healthCheck)
+        public void RegisterDescriptors(IServiceCollection services)
         {
-            if (healthCheck == null) throw new ArgumentNullException(nameof(healthCheck));
-            _services.AddSingleton(healthCheck);
-        }
+            if (services == null) throw new ArgumentNullException(nameof(services));
 
-        public void Add<T>() where T : class, IHealthCheck
-        {
-            _services.AddScoped<IHealthCheck, T>();
-        }
-
-        public void Add(Func<IServiceProvider, IHealthCheck> factory)
-        {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
-            _services.AddScoped(factory);
-        }
-
-        public void Register(Action<IServiceCollection> builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            builder(_services);
+            foreach (var descriptor in _descriptors)
+                services.Add(
+                    new ServiceDescriptor(typeof(IHealthCheck), descriptor.Factory, descriptor.Lifetime));
         }
     }
 }

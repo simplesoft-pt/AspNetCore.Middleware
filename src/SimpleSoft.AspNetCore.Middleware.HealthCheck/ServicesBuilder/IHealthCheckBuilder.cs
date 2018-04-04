@@ -22,8 +22,7 @@
 // SOFTWARE.
 #endregion
 
-using System;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 // ReSharper disable once CheckNamespace
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
@@ -34,27 +33,14 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     public interface IHealthCheckBuilder
     {
         /// <summary>
-        /// Adds the given health check.
+        /// Collection of health check descriptors
         /// </summary>
-        /// <param name="healthCheck">The health check</param>
-        void Add(IHealthCheck healthCheck);
+        IReadOnlyList<IHealthCheckServiceDescriptor> Descriptors { get; }
 
         /// <summary>
-        /// Adds the given type as an health check
+        /// Adds a new instance to the <see cref="Descriptors"/> collection.
         /// </summary>
-        /// <typeparam name="T">The health check type</typeparam>
-        void Add<T>() where T : class, IHealthCheck;
-
-        /// <summary>
-        /// Adds the given type as an health check
-        /// </summary>
-        /// <param name="factory">The health check factory</param>
-        void Add(Func<IServiceProvider, IHealthCheck> factory);
-
-        /// <summary>
-        /// Allows the direct health check registration
-        /// </summary>
-        /// <param name="builder">The builder action</param>
-        void Register(Action<IServiceCollection> builder);
+        /// <param name="descriptor">The health check service descriptor</param>
+        void Add(IHealthCheckServiceDescriptor descriptor);
     }
 }

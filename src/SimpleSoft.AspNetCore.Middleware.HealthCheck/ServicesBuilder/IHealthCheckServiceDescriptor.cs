@@ -23,33 +23,24 @@
 #endregion
 
 using System;
-using SimpleSoft.AspNetCore.Middleware.HealthCheck;
+using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection
+namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
     /// <summary>
-    /// Extension methods for <see cref="IServiceCollection"/> instances.
+    /// The health check service descriptor
     /// </summary>
-    public static class HealthCheckServiceCollectionExtensions
+    public interface IHealthCheckServiceDescriptor
     {
         /// <summary>
-        /// Adds services required for health check.
+        /// The health check builder
         /// </summary>
-        /// <param name="services">The services collection</param>
-        /// <param name="builder">The configuration builder</param>
-        /// <returns>The service collection after changes</returns>
-        public static IServiceCollection AddHealthCheck(this IServiceCollection services, Action<IHealthCheckBuilder> builder)
-        {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+        Func<IServiceProvider, IHealthCheck> Factory { get; }
 
-            var cfg = new HealthCheckBuilder();
-            builder(cfg);
-
-            cfg.RegisterDescriptors(services);
-
-            return services;
-        }
+        /// <summary>
+        /// The heclth check lifetime
+        /// </summary>
+        ServiceLifetime Lifetime { get; }
     }
 }
