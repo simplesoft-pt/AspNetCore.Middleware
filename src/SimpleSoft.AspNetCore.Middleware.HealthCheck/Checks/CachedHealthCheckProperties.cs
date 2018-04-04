@@ -35,7 +35,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// <summary>
         /// Creates a new instance
         /// </summary>
-        /// <param name="expiration">The cache duration</param>
+        /// <param name="expiration">The cache expiration</param>
         public CachedHealthCheckProperties(TimeSpan expiration)
         {
             Expiration = expiration;
