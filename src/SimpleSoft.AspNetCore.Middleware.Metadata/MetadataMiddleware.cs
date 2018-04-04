@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
 {
@@ -68,7 +69,8 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
             var jsonSettings = new JsonSerializerSettings
             {
                 Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None,
-                NullValueHandling = Options.IncludeNullProperties ? NullValueHandling.Include : NullValueHandling.Ignore
+                NullValueHandling = Options.IncludeNullProperties ? NullValueHandling.Include : NullValueHandling.Ignore,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             return context.Response.WriteJsonAsync(metadata, jsonSettings);
         }

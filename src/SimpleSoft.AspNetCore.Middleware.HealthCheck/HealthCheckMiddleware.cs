@@ -33,6 +33,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
@@ -75,7 +76,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             var jsonSettings = new JsonSerializerSettings
             {
-                Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None
+                Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             if (Options.StringEnum)
                 jsonSettings.Converters.Add(new StringEnumConverter(true));
