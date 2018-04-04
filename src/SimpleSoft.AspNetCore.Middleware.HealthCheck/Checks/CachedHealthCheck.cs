@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -38,6 +39,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public class CachedHealthCheck : IHealthCheck
     {
+        private static readonly string[] DefaultTags =
+        {
+            "cached"
+        };
+
+        private IReadOnlyCollection<string> _cachedTags;
+
         /// <summary>
         /// Creates a new instance.
         /// </summary>
@@ -91,7 +99,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         public bool Required => HealthCheck.Required;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Tags => HealthCheck.Tags;
+        public IReadOnlyCollection<string> Tags => GetTags();
 
         /// <inheritdoc />
         public async Task UpdateStatusAsync(CancellationToken ct)
@@ -123,6 +131,13 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
                 return HealthCheck.Status;
             });
+        }
+
+        private IReadOnlyCollection<string> GetTags()
+        {
+            return HealthCheck.Tags.Count == 0
+                ? DefaultTags
+                : (_cachedTags ?? (_cachedTags = DefaultTags.Concat(HealthCheck.Tags).ToList()));
         }
     }
 }
