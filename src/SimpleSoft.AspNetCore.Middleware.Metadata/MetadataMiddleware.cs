@@ -70,7 +70,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
             {
                 Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None,
                 NullValueHandling = Options.IncludeNullProperties ? NullValueHandling.Include : NullValueHandling.Ignore,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = MiddlewareSingletons.CamelCaseResolver
             };
             return context.Response.WriteJsonAsync(metadata, jsonSettings);
         }

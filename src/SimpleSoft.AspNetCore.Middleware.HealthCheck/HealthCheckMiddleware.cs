@@ -77,7 +77,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             var jsonSettings = new JsonSerializerSettings
             {
                 Formatting = Options.IndentJson ? Formatting.Indented : Formatting.None,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = MiddlewareSingletons.CamelCaseResolver
             };
             if (Options.StringEnum)
                 jsonSettings.Converters.Add(new StringEnumConverter(true));

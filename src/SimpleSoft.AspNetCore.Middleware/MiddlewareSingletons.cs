@@ -24,6 +24,7 @@
 
 using System.Text;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json.Serialization;
 
 namespace SimpleSoft.AspNetCore.Middleware
 {
@@ -40,5 +41,10 @@ namespace SimpleSoft.AspNetCore.Middleware
         {
             Encoding = Encoding.UTF8
         }.ToString();
+
+        /// <summary>
+        /// Camel case properties resolver
+        /// </summary>
+        public static readonly IContractResolver CamelCaseResolver = new CamelCasePropertyNamesContractResolver();
     }
 }
