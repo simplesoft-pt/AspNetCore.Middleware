@@ -22,3 +22,6 @@ Install-Package SimpleSoft.AspNetCore.Middleware.Metadata
 dotnet add package SimpleSoft.AspNetCore.Middleware
 dotnet add package SimpleSoft.AspNetCore.Middleware.HealthCheck
 dotnet add package SimpleSoft.AspNetCore.Middleware.Metadata
+```
+## Compatibility
+The middlewares were implemented having ASP.NET Core 2 in mind, so they support `.NETStandard 2.0` and up.
