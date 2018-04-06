@@ -1,2 +1,2 @@
 # AspNetCore.Middleware
-Utilitary middleware for ASP.NET Core applications
+Utilitary middleware for ASP.NET Core applications 
