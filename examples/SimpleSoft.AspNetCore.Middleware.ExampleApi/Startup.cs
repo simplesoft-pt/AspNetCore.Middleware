@@ -103,7 +103,8 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
                 },
                 Path = "_health",
                 IndentJson = env.IsDevelopment(),
-                StringEnum = true
+                StringEnum = true,
+                ParallelExecution = true
             });
 
             app.Run(async context =>
