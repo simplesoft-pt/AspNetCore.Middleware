@@ -43,5 +43,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Should enums be returned as strings? Defaults to 'true'.
         /// </summary>
         public bool StringEnum { get; set; } = true;
+
+        /// <summary>
+        /// Run the health checks in parallel? Defaults to 'false'.
+        /// </summary>
+        public bool ParallelExecution { get; set; } = false;
     }
 }

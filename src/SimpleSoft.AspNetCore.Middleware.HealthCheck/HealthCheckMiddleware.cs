@@ -66,7 +66,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             Logger.LogDebug("Checking all health checks");
 
             var healthCheck = await RunHealthChecksAsync(
-                context.RequestServices.GetServices<IHealthCheck>(), context, context.RequestAborted);
+                context.RequestServices.GetServices<IHealthCheck>(), Options.ParallelExecution, context, context.RequestAborted);
 
             Logger.LogDebug("All health checks statuses have been updated");
 
@@ -87,10 +87,12 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Runs the health checks
         /// </summary>
         /// <param name="healthChecks">The collection of health checks</param>
+        /// <param name="parallelExecution">Run the health checks in parallel?</param>
         /// <param name="context">The HTTP context</param>
         /// <param name="ct">The cancellation token</param>
         /// <returns>A task to be awaited for the result</returns>
-        protected virtual async Task<HealthCheckModel> RunHealthChecksAsync(IEnumerable<IHealthCheck> healthChecks, HttpContext context, CancellationToken ct)
+        protected virtual async Task<HealthCheckModel> RunHealthChecksAsync(
+            IEnumerable<IHealthCheck> healthChecks, bool parallelExecution, HttpContext context, CancellationToken ct)
         {
             var result = new HealthCheckModel
             {
@@ -98,27 +100,54 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                 StartedOn = DateTimeOffset.Now,
                 Dependencies = new Dictionary<string, HealthCheckDependencyModel>()
             };
-            foreach (var healthCheck in healthChecks)
+
+            if (parallelExecution)
             {
-                using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
+                var tasks = healthChecks.Select(async healthCheck =>
                 {
-                    Logger.LogDebug("Performing an health check");
-
                     var status = await CalculateStatusAsync(healthCheck, context, ct);
-                    if (status == HealthCheckStatus.Red)
+                    return new
                     {
-                        if (healthCheck.Required)
-                            result.Status = HealthCheckGlobalStatus.Red;
-                        else if (result.Status == HealthCheckGlobalStatus.Green)
-                            result.Status = HealthCheckGlobalStatus.Yellow;
-                    }
+                        healthCheck.Name,
+                        Value = new HealthCheckDependencyModel
+                        {
+                            Status = status,
+                            Required = healthCheck.Required,
+                            Tags = healthCheck.Tags.ToArray()
+                        }
+                    };
+                }).ToList();
 
-                    result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
+                Logger.LogDebug("Running all health checks in parallel");
+                await Task.WhenAll(tasks);
+
+                foreach (var task in tasks)
+                    result.Dependencies.Add(task.Result.Name, task.Result.Value);
+            }
+            else
+            {
+                foreach (var healthCheck in healthChecks)
+                {
+                    using (Logger.BeginScope("Name:'{name}'", healthCheck.Name))
                     {
-                        Status = status,
-                        Required = healthCheck.Required,
-                        Tags = healthCheck.Tags.ToArray()
-                    });
+                        Logger.LogDebug("Performing an health check");
+
+                        var status = await CalculateStatusAsync(healthCheck, context, ct);
+                        if (status == HealthCheckStatus.Red)
+                        {
+                            if (healthCheck.Required)
+                                result.Status = HealthCheckGlobalStatus.Red;
+                            else if (result.Status == HealthCheckGlobalStatus.Green)
+                                result.Status = HealthCheckGlobalStatus.Yellow;
+                        }
+
+                        result.Dependencies.Add(healthCheck.Name, new HealthCheckDependencyModel
+                        {
+                            Status = status,
+                            Required = healthCheck.Required,
+                            Tags = healthCheck.Tags.ToArray()
+                        });
+                    }
                 }
             }
 
