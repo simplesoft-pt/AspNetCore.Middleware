@@ -45,8 +45,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         public bool StringEnum { get; set; } = true;
 
         /// <summary>
-        /// Run the health checks in parallel? Defaults to 'false'.
+        /// Run the health checks in parallel? Defaults to 'true'.
         /// </summary>
-        public bool ParallelExecution { get; set; } = false;
+        public bool ParallelExecution { get; set; } = true;
     }
 }
