@@ -1,5 +1,6 @@
 # ASP.NET Core - Middleware
 Collection of utilitary middleware for ASP.NET Core 2+ applications.
+Check the [documentation](https://github.com/simplesoft-pt/AspNetCore.Middleware/wiki/Metadata) for more details.
 
 ## Installation
 The collection is available via [NuGet](https://www.nuget.org/packages?q=simplesoft.aspnetcore.middleware) packages:
@@ -27,6 +28,7 @@ dotnet add package SimpleSoft.AspNetCore.Middleware.Metadata
 The middlewares were implemented having ASP.NET Core 2 in mind, so they support `.NETStandard 2.0` and up.
 
 ## Examples
+Simple code snippets showing how to use the middlewares. For a more detailed usage, just check the wiki.
 
 ### Metadata [[wiki]](https://github.com/simplesoft-pt/AspNetCore.Middleware/wiki/Metadata)
 ```csharp
@@ -44,7 +46,7 @@ namespace ExampleApi
             {
                 BeforeInvoke = ctx =>
                 {
-                    if (!IsLocalhostRequest(ctx))
+                    if (!"localhost".Equals(ctx.Request.Host.Host))
                         ctx.Abort();
                     return Task.CompletedTask;
                 },
@@ -52,12 +54,6 @@ namespace ExampleApi
                 Environment = env.EnvironmentName
             });
         }
-    }
-    
-    private static bool IsLocalhostRequest(HttpContext ctx)
-    {
-        var host = ctx.Request.Host.Host;
-        return "localhost".Equals(host) || "127.0.0.1".Equals(host);
     }
 }
 ```
