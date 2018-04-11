@@ -29,7 +29,6 @@ The middlewares were implemented having ASP.NET Core 2 in mind, so they support 
 ## Examples
 
 ### Metadata
-Potatoes
 ```csharp
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.2.0.18001")]
@@ -78,3 +77,4 @@ namespace ExampleApi
     }
 }
 ```
+*Note:* Check the [wiki](https://github.com/simplesoft-pt/AspNetCore.Middleware/wiki/Metadata) for more details.
