@@ -65,15 +65,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             app.UseMetadata(new MetadataOptions
             {
-                BeforeInvoke = ctx =>
-                {
-                    //  example: only available via localhost, aborting the request if false
-                    if (IsLocalhostRequest(ctx))
-                        return Task.CompletedTask;
-                    
-                    ctx.Abort();
-                    return Task.CompletedTask;
-                },
+                BeforeInvoke = BeforeInvoke.LocalOnly,
                 Path = "_meta",
                 IndentJson = env.IsDevelopment(),
                 IncludeNullProperties = true,
