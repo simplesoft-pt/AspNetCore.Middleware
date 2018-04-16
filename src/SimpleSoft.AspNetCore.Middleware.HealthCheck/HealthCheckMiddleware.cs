@@ -97,7 +97,7 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
             var result = new HealthCheckModel
             {
                 Status = HealthCheckGlobalStatus.Green,
-                StartedOn = DateTimeOffset.Now,
+                ServerStartedOn = Options.ServerStartedOn,
                 Dependencies = new Dictionary<string, HealthCheckDependencyModel>(StringComparer.OrdinalIgnoreCase)
             };
 
@@ -119,8 +119,6 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                     result.Dependencies.Add(dependency.Key, dependency.Value);
                 }
             }
-
-            result.TerminatedOn = DateTimeOffset.Now;
 
             return result;
         }

@@ -38,14 +38,9 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         public HealthCheckGlobalStatus Status { get; set; }
 
         /// <summary>
-        /// The date and time when the check started
+        /// The date and time when the server has started
         /// </summary>
-        public DateTimeOffset StartedOn { get; set; }
-
-        /// <summary>
-        /// The date and time when the check terminated
-        /// </summary>
-        public DateTimeOffset TerminatedOn { get; set; }
+        public DateTimeOffset ServerStartedOn { get; set; }
 
         /// <summary>
         /// The health check dependencies

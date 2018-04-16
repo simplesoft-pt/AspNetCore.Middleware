@@ -22,6 +22,8 @@
 // SOFTWARE.
 #endregion
 
+using System;
+
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
     /// <summary>
@@ -29,6 +31,8 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
     /// </summary>
     public class HealthCheckOptions : SimpleSoftMiddlewareOptions
     {
+        private static readonly DateTimeOffset DefaultServerStartedOn = DateTimeOffset.Now;
+
         /// <summary>
         /// Path for which the middleware responds. Defaults to 'api/_health'.
         /// </summary>
@@ -48,5 +52,10 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// Run the health checks in parallel? Defaults to 'true'.
         /// </summary>
         public bool ParallelExecution { get; set; } = true;
+
+        /// <summary>
+        /// The API startup date and time. Defaults to this class first static initialization date and time.
+        /// </summary>
+        public DateTimeOffset ServerStartedOn { get; set; } = DefaultServerStartedOn;
     }
 }
