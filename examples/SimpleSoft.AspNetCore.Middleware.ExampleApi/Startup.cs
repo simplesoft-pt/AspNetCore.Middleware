@@ -75,24 +75,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 
             app.UseHealthCheck(new HealthCheckOptions
             {
-                BeforeInvoke = ctx =>
-                {
-                    //  example: only available via localhost or to an admin
-                    if (IsLocalhostRequest(ctx))
-                        return Task.CompletedTask;
-                    
-                    if (ctx.User.Identity.IsAuthenticated)
-                    {
-                        if (ctx.User.IsInRole("admin"))
-                            return Task.CompletedTask;
-
-                        ctx.Response.StatusCode = 403;
-                        return ctx.Response.WriteAsync("Forbidden");
-                    }
-
-                    ctx.Response.StatusCode = 401;
-                    return ctx.Response.WriteAsync("Unauthorized");
-                },
+                BeforeInvoke = BeforeInvoke.IsLocalOrHasAnyRole("admin"),
                 Path = "_health",
                 IndentJson = env.IsDevelopment(),
                 StringEnum = true,
@@ -103,12 +86,6 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             {
                 await context.Response.WriteAsync(IndexHtml);
             });
-        }
-
-        private static bool IsLocalhostRequest(HttpContext ctx)
-        {
-            var host = ctx.Request.Host.Host;
-            return "localhost".Equals(host) || "127.0.0.1".Equals(host);
         }
 
         private const string IndexHtml = @"
