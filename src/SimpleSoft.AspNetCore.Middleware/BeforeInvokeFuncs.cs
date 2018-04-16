@@ -41,7 +41,7 @@ namespace SimpleSoft.AspNetCore.Middleware
         public static readonly Func<HttpContext, Task> DoNothing = ctx => Task.CompletedTask;
 
         /// <summary>
-        /// Aborts the request if not from a local client.
+        /// Aborts the request if not made by a local client.
         /// </summary>
         public static readonly Func<HttpContext, Task> LocalOnly = ctx =>
         {
