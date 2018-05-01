@@ -109,7 +109,18 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
                 await Task.WhenAll(tasks);
 
                 foreach (var task in tasks)
-                    result.Dependencies.Add(task.Result.Key, task.Result.Value);
+                {
+                    var dependency = task.Result.Value;
+                    result.Dependencies.Add(task.Result.Key, dependency);
+
+                    if (dependency.Status == HealthCheckStatus.Red)
+                    {
+                        if (dependency.Required)
+                            result.Status = HealthCheckGlobalStatus.Red;
+                        else if(result.Status == HealthCheckGlobalStatus.Green)
+                            result.Status = HealthCheckGlobalStatus.Yellow;
+                    }
+                }
             }
             else
             {
