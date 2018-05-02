@@ -56,11 +56,13 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         protected new MetadataOptions Options { get; }
 
         /// <inheritdoc />
-        protected override Task OnInvoke(HttpContext context)
+        protected override async Task OnInvoke(HttpContext context)
         {
             Logger.LogDebug("Returning application metadata");
 
-            var metadata = GetMetadata(context);
+            var metadata = Options.BuildMetadata == null
+                ? GetMetadata(context)
+                : await Options.BuildMetadata(context, Options);
 
             context.Response.Clear();
             context.Response.StatusCode = 200;
@@ -71,7 +73,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
                 NullValueHandling = Options.IncludeNullProperties ? NullValueHandling.Include : NullValueHandling.Ignore,
                 ContractResolver = MiddlewareSingletons.CamelCaseResolver
             };
-            return context.Response.WriteJsonAsync(metadata, jsonSettings);
+            await context.Response.WriteJsonAsync(metadata, jsonSettings);
         }
 
         /// <summary>
@@ -79,6 +81,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// as the JSON response.
         /// </summary>
         /// <returns>The metadata instance</returns>
+        [Obsolete("Will be removed in next major release. Use MetadataOptions.BuildMetadata instead")]
         protected virtual MetadataModel GetMetadata(HttpContext context)
         {
             var version = Options.Version == null

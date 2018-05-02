@@ -24,6 +24,8 @@
 
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace SimpleSoft.AspNetCore.Middleware.Metadata
 {
@@ -72,6 +74,11 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
         /// The API startup date and time. Defaults to this class first static initialization date and time.
         /// </summary>
         public DateTimeOffset? StartedOn { get; set; } = DefaultStartedOn;
+
+        /// <summary>
+        /// Builds the medatata model that will be serialized as the JSON response. Defaults to 'null'.
+        /// </summary>
+        public Func<HttpContext, MetadataOptions, Task<MetadataModel>> BuildMetadata { get; set; }
 
         /// <summary>
         /// The API version. Defaults to entry assembly file and product versions.
