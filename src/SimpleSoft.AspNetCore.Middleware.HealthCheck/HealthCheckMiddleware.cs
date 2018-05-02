@@ -70,6 +70,9 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 
             Logger.LogDebug("All health checks statuses have been updated");
 
+            if (Options.BeforeSerialization != null)
+                healthCheck = await Options.BeforeSerialization(context, healthCheck);
+
             context.Response.Clear();
             context.Response.StatusCode = healthCheck.Status == HealthCheckGlobalStatus.Red ? 500 : 200;
 

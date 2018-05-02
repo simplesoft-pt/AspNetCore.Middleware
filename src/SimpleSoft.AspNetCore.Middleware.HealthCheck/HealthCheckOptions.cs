@@ -23,6 +23,8 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
 {
@@ -57,5 +59,11 @@ namespace SimpleSoft.AspNetCore.Middleware.HealthCheck
         /// The API startup date and time. Defaults to this class first static initialization date and time.
         /// </summary>
         public DateTimeOffset ServerStartedOn { get; set; } = DefaultServerStartedOn;
+
+        /// <summary>
+        /// Allows the manipulation of the health check result before beeing
+        /// serialized and returned by the middleware. Defaults to 'null'.
+        /// </summary>
+        public Func<HttpContext, HealthCheckModel, Task<HealthCheckModel>> BeforeSerialization { get; set; }
     }
 }
