@@ -82,6 +82,9 @@ namespace SimpleSoft.AspNetCore.Middleware
 
             Logger.LogDebug("Invoking the middleware logic");
             await OnInvoke(context);
+
+            if (Options.AfterInvoke != null)
+                await Options.AfterInvoke(context);
         }
 
         /// <summary>

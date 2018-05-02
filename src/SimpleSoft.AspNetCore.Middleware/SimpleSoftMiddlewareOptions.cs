@@ -38,5 +38,10 @@ namespace SimpleSoft.AspNetCore.Middleware
         /// the middleware will stop the execution.
         /// </summary>
         public Func<HttpContext, Task> BeforeInvoke { get; set; }
+
+        /// <summary>
+        /// Invoked after the delegate logic.
+        /// </summary>
+        public Func<HttpContext, Task> AfterInvoke { get; set; }
     }
 }
