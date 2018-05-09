@@ -51,7 +51,7 @@ namespace SimpleSoft.AspNetCore.Middleware.Metadata
                 DefaultMinor = (uint) fvi.FileMinorPart;
                 DefaultPatch = (uint) fvi.FileBuildPart;
                 DefaultRevision = (uint) fvi.FilePrivatePart;
-                DefaultAlias = fvi.ProductName;
+                DefaultAlias = fvi.ProductVersion;
             }
             catch (Exception)
             {

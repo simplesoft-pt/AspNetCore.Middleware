@@ -11,9 +11,9 @@ using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
 
 //  example: will be used by the metadata endpoint by default
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.0")]
 [assembly: AssemblyFileVersion("1.2.0.18001")]
-[assembly: AssemblyProduct("1.2.0-rc01")]
+[assembly: AssemblyInformationalVersion("1.2.0-rc01")]
 
 namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
 {
