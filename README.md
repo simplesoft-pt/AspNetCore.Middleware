@@ -151,9 +151,9 @@ namespace ExampleApi
 ```
 ```json
 //    GET http://localhost:5000/api/_health
-//    200 OK
+//    500 Internal Server Error
 {
-  "status": "green",
+  "status": "red",
   "startedOn": "2018-04-11T23:42:26.54719+01:00",
   "terminatedOn": "2018-04-11T23:42:28.7647715+01:00",
   "dependencies": {
