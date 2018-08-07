@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SimpleSoft.AspNetCore.Middleware.ReducedInsights</RootNamespace>
+    <AssemblyTitle>SimpleSoft.AspNetCore.Middleware.ReducedInsights</AssemblyTitle>
+    <AssemblyName>SimpleSoft.AspNetCore.Middleware.ReducedInsights</AssemblyName>
+    <Description>Utilitary middleware for ASP.NET Core applications, that will return the insights about HTTP requests.</Description>
+    <Product>SimpleSoft.AspNetCore.Middleware</Product>
+    <Company>SimpleSoft.pt</Company>
+    <Copyright>Copyright © 2018 SimpleSoft.pt</Copyright>
+    <Authors>João Simões</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>../../tools/SimpleSoft.AspNetCore.snk</AssemblyOriginatorKeyFile>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <SignAssembly>true</SignAssembly>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>SimpleSoft.AspNetCore.Middleware.ReducedInsights</PackageId>
+    <PackageTags>aspnet;aspnetcore;middleware</PackageTags>
+    <PackageIconUrl>https://avatars2.githubusercontent.com/u/30837484</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/simplesoft-pt/AspNetCore.Middleware</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/simplesoft-pt/AspNetCore.Middleware/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/simplesoft-pt/AspNetCore.Middleware.git</RepositoryUrl>
+    <GeneratePackageOnBuild Condition=" '$(BuildConfiguration)' == 'release' ">true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.1.1.18129</FileVersion>
+    <VersionPrefix>1.1.1</VersionPrefix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleSoft.AspNetCore.Middleware\SimpleSoft.AspNetCore.Middleware.csproj" />
+  </ItemGroup>
+
+</Project>
