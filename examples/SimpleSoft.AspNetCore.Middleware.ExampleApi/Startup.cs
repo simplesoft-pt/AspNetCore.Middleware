@@ -61,6 +61,8 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseReducedInsights();
+
             app.UseDeveloperExceptionPage();
 
             app.UseMetadata(new MetadataOptions

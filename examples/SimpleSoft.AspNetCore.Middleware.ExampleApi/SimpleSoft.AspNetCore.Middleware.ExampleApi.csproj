@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -13,6 +13,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\SimpleSoft.AspNetCore.Middleware.HealthCheck\SimpleSoft.AspNetCore.Middleware.HealthCheck.csproj" />
         <ProjectReference Include="..\..\src\SimpleSoft.AspNetCore.Middleware.Metadata\SimpleSoft.AspNetCore.Middleware.Metadata.csproj" />
+        <ProjectReference Include="..\..\src\SimpleSoft.AspNetCore.Middleware.ReducedInsights\SimpleSoft.AspNetCore.Middleware.ReducedInsights.csproj" />
     </ItemGroup>
 
 </Project>
