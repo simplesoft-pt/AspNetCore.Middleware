@@ -39,6 +39,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SimpleSoft.AspNetCore.Middleware\SimpleSoft.AspNetCore.Middleware.csproj" />
   </ItemGroup>
 

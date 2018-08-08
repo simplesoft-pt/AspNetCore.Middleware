@@ -34,6 +34,12 @@ namespace SimpleSoft.AspNetCore.Middleware.ReducedInsights
     public class ReducedInsightsOptions : SimpleSoftMiddlewareOptions
     {
         /// <summary>
+        /// Path for which the middleware responds the current statistics.
+        /// Defaults to 'api/_insights'.
+        /// </summary>
+        public string Path { get; set; } = "api/_insights";
+
+        /// <summary>
         /// Maps the request to a given key. An an example, it can be used to
         /// group different addresses into a common key. Defaults to 'null'.
         /// </summary>
