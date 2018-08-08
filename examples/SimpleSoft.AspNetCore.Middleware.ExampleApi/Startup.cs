@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using SimpleSoft.AspNetCore.Middleware.HealthCheck;
 using SimpleSoft.AspNetCore.Middleware.Metadata;
+using SimpleSoft.AspNetCore.Middleware.ReducedInsights;
 
 //  example: will be used by the metadata endpoint by default
 [assembly: AssemblyVersion("1.0.0")]
@@ -61,7 +62,10 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseReducedInsights();
+            app.UseReducedInsights(new ReducedInsightsOptions
+            {
+                Path = "_insights"
+            });
 
             app.UseDeveloperExceptionPage();
 
@@ -104,6 +108,7 @@ namespace SimpleSoft.AspNetCore.Middleware.ExampleApi
             <ul>
                 <li><a href=""/_meta"" target=""_blank"">Metadata (GET /_meta)</a></li>
                 <li><a href=""/_health"" target=""_blank"">Health Checks (GET /_health)</a></li>
+                <li><a href=""/_insights"" target=""_blank"">Insights (GET /_insights)</a></li>
             </ul>
         </div>
     </body>
